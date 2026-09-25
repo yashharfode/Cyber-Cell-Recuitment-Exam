@@ -3,13 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { 
   CheckCircle2, 
   Camera, 
-  Maximize, 
+  Maximize2, 
   Shield, 
   User, 
   RefreshCw, 
   AlertCircle,
-  Play,
-  FileText
+  ArrowRight,
+  ArrowLeft,
+  FileText,
+  AlertTriangle,
+  MonitorCheck,
+  Video
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { savePhoto } from '../storage/indexedDb';
@@ -73,7 +77,7 @@ export default function PreCheck() {
       streamRef.current = stream;
       setCameraPermission('granted');
 
-      // Immediate attachment if element is already present
+      // Immediate attachment if element is present
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play().catch(e => console.warn('Video play error:', e));
@@ -81,7 +85,7 @@ export default function PreCheck() {
     } catch (err: any) {
       console.error('Camera access error:', err);
       setCameraPermission('denied');
-      setErrorMsg('Camera permission denied or camera not found. Camera is required for identity integrity.');
+      setErrorMsg('Camera access was denied or hardware not found. A functional webcam is required for identity verification.');
     }
   };
 
@@ -108,7 +112,7 @@ export default function PreCheck() {
     };
   }, []);
 
-  // Capture single verification photo and save to localStorage
+  // Capture verification photo and save to localStorage
   const capturePhoto = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -122,7 +126,7 @@ export default function PreCheck() {
     const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     setCapturedPhotoUrl(dataUrl);
 
-    // Save to localStorage as requested by user
+    // Save to localStorage as requested
     try {
       localStorage.setItem('candidate_photo', dataUrl);
       localStorage.setItem('candidate_photo_captured_at', new Date().toISOString());
@@ -176,7 +180,7 @@ export default function PreCheck() {
     navigate('/game');
   };
 
-  // Gatekeeper: All requirements must pass (Section 21)
+  // Gatekeeper: All requirements must pass
   const isReadyToStart = (mode === 'demo') || (
     cameraPermission === 'granted' &&
     capturedPhotoUrl !== null &&
@@ -184,100 +188,134 @@ export default function PreCheck() {
   );
 
   return (
-    <div className="min-h-screen bg-[#05070D] text-cyber-text flex items-center justify-center p-4 md:p-8 font-mono-cyber">
-      <div className="w-full max-w-3xl cyber-panel border border-cyber-border p-6 md:p-8 shadow-2xl relative">
-        
-        {/* Header */}
-        <div className="border-b border-cyber-border pb-4 mb-6 flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-2 text-cyber-primary text-xs uppercase tracking-widest">
-              <Shield className="w-4 h-4" />
-              CYBER CELL • SATI VIDISHA
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mt-1">
-              SYSTEM PRE-CHECK
-            </h1>
-            <p className="text-xs text-cyber-muted mt-1">
-              Complete mandatory identity & system readiness checks before entering OPERATION ZERO-DAY.
-            </p>
-          </div>
-          <span className="text-[10px] px-2.5 py-1 bg-cyber-panel-secondary border border-cyber-border text-cyber-primary">
-            ROUND 1 GATE
+    <div className="min-h-screen bg-[#05070D] text-[#EAF7F5] font-sans flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-slate-700 selection:text-white">
+      
+      {/* Top Bar */}
+      <header className="max-w-4xl w-full mx-auto flex items-center justify-between pb-6 border-b border-white/[0.08]">
+        <button
+          onClick={() => navigate(mode === 'recruitment' ? '/login' : '/')}
+          className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to {mode === 'recruitment' ? 'Login' : 'Portal'}</span>
+        </button>
+
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-400">
+            Cyber Cell • SATI Vidisha
           </span>
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.1] text-slate-300">
+            Stage 01 • Pre-Check
+          </span>
+        </div>
+      </header>
+
+      {/* Main Container */}
+      <main className="max-w-4xl w-full mx-auto my-6 sm:my-8 space-y-6">
+        
+        {/* Title Header */}
+        <div className="space-y-1">
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Technical Recruitment Assessment 2026
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            System & Identity Pre-Check
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed pt-1">
+            Complete the identity verification and hardware readiness checks below. Continuous fullscreen and live proctoring are enforced to ensure assessment integrity.
+          </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-3 bg-cyber-danger/15 border border-cyber-danger text-cyber-danger text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMsg}</span>
+          <div className="p-3.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-xs flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
+            <span className="leading-relaxed">{errorMsg}</span>
           </div>
         )}
 
-        <div className="space-y-5">
+        {/* Verification Check Cards */}
+        <div className="space-y-4">
+          
           {/* Card 1: Candidate Identity */}
-          <div className="p-4 bg-cyber-panel-secondary border border-cyber-border flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/30">
-                <User className="w-5 h-5 text-cyber-primary" />
+          <div className="p-5 rounded-lg bg-[#0A0E18] border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-md bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-300 shrink-0">
+                <User className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs text-cyber-muted uppercase">CANDIDATE IDENTITY</p>
-                <p className="text-base font-bold text-white">
-                  {candidate ? candidate.name : 'DEMO USER'}
-                </p>
-                <p className="text-xs text-cyber-primary">
-                  SCHOLAR NO: {candidate ? candidate.scholarNumber : '00000'} • DOMAIN: {candidate ? candidate.domain : 'Technical'}
-                </p>
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
+                  Candidate Profile
+                </span>
+                <div className="text-base font-semibold text-white mt-0.5">
+                  {candidate ? candidate.name : 'Demo Candidate'}
+                </div>
+                <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                  <span className="font-mono text-slate-300">
+                    Scholar ID: {candidate ? candidate.scholarNumber : '00000'}
+                  </span>
+                  <span>•</span>
+                  <span>Domain: {candidate ? candidate.domain : 'Technical'}</span>
+                </div>
               </div>
             </div>
-            <CheckCircle2 className="w-6 h-6 text-cyber-success" />
+
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium self-start sm:self-center">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>Identity Verified</span>
+            </div>
           </div>
 
           {/* Card 2: Camera Access & Identity Capture */}
-          <div className="p-4 bg-cyber-panel-secondary border border-cyber-border space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/30">
-                  <Camera className="w-5 h-5 text-cyber-primary" />
+          <div className="p-5 rounded-lg bg-[#0A0E18] border border-white/[0.08] space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-10 h-10 rounded-md bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-300 shrink-0">
+                  <Camera className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-xs text-cyber-muted uppercase">CAMERA & LIVE PROCTORING</p>
-                  <p className="text-sm font-bold text-white">Live Identity Verification & Continuous Proctoring</p>
-                  <p className="text-[11px] text-cyber-muted">
-                    Camera remains active in your HUD during the test to verify continuous candidate presence.
+                  <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
+                    Webcam Verification
+                  </span>
+                  <div className="text-sm font-semibold text-white mt-0.5">
+                    Live Proctoring & Candidate Photo Verification
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Your camera will remain active in the assessment workspace to ensure fair evaluation.
                   </p>
                 </div>
               </div>
 
-              <div>
+              <div className="shrink-0 self-start sm:self-center">
                 {cameraPermission !== 'granted' ? (
                   <button
                     onClick={requestCamera}
-                    className="px-4 py-2 border border-cyber-primary text-cyber-primary text-xs hover:bg-cyber-primary hover:text-black font-bold transition-all"
+                    className="px-4 py-2 rounded-md bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    ENABLE CAMERA
+                    Enable Camera
                   </button>
                 ) : capturedPhotoUrl ? (
-                  <div className="flex items-center gap-2 text-cyber-success text-xs font-bold">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>PHOTO VERIFIED</span>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Photo Verified</span>
                   </div>
                 ) : (
                   <button
                     onClick={capturePhoto}
-                    className="px-4 py-2 bg-cyber-primary text-black text-xs font-bold hover:bg-white transition-all shadow-[0_0_10px_rgba(0,255,204,0.3)]"
+                    className="px-4 py-2 rounded-md bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    CAPTURE PHOTO
+                    Capture Photo
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Video stream or Captured photo preview */}
+            {/* Live Camera Stream & Photo Preview Panel */}
             {cameraPermission === 'granted' && (
-              <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/60 p-4 border border-cyber-border rounded-lg">
-                <div className="w-56 h-40 bg-black border border-cyber-primary/40 rounded overflow-hidden relative shadow-inner">
-                  {/* Keep video element mounted in DOM so stream remains playing */}
+              <div className="p-4 rounded-lg bg-[#060911] border border-white/[0.06] flex flex-col md:flex-row items-center gap-5">
+                
+                {/* Visual Viewport */}
+                <div className="w-56 h-40 bg-black rounded-md border border-white/[0.1] relative overflow-hidden shrink-0 shadow-sm">
+                  {/* Mirrored Live Video Feed */}
                   <video 
                     ref={videoRef} 
                     autoPlay 
@@ -286,6 +324,7 @@ export default function PreCheck() {
                     className={`w-full h-full object-cover transform -scale-x-100 ${capturedPhotoUrl ? 'hidden' : 'block'}`} 
                   />
                   
+                  {/* Verified Captured Snapshot */}
                   {capturedPhotoUrl && (
                     <img 
                       src={capturedPhotoUrl} 
@@ -294,148 +333,187 @@ export default function PreCheck() {
                     />
                   )}
 
+                  {/* Status Overlay */}
                   {!capturedPhotoUrl ? (
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/80 px-2 py-0.5 rounded text-[10px] text-cyber-primary border border-cyber-primary/30">
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/80 px-2 py-0.5 rounded text-[10px] text-slate-200 border border-white/10 font-mono">
                       <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                      <span>LIVE WEBCAM</span>
+                      <span>LIVE FEED</span>
                     </div>
                   ) : (
-                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/90 px-2 py-0.5 rounded text-[10px] text-cyber-success border border-cyber-success/40">
-                      <CheckCircle2 className="w-3 h-3 text-cyber-success" />
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/80 px-2 py-0.5 rounded text-[10px] text-emerald-300 border border-emerald-500/30 font-medium">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                       <span>SAVED SNAPSHOT</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex-1 text-xs text-cyber-muted space-y-2">
+                {/* Instructions & Actions */}
+                <div className="flex-1 text-xs text-slate-300 space-y-2">
                   {!capturedPhotoUrl ? (
                     <>
-                      <p className="text-white font-medium">Position your face clearly inside the frame.</p>
-                      <p className="text-[11px] text-slate-400">
-                        Ensure good lighting and centered posture. Click <strong>Capture Photo</strong> to verify your identity and save the snapshot.
+                      <div className="font-semibold text-white">Center your face in the camera preview</div>
+                      <p className="text-slate-400 text-xs leading-relaxed">
+                        Ensure adequate room lighting. When ready, click the capture button to record your identity snapshot for the exam record.
                       </p>
                       <button
                         onClick={capturePhoto}
-                        className="px-4 py-2 bg-cyber-primary text-black text-xs font-bold hover:bg-white transition-all shadow-[0_0_12px_rgba(0,255,204,0.3)] rounded mt-1 flex items-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2 bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs rounded-md transition-colors flex items-center gap-2 cursor-pointer mt-1"
                       >
-                        <Camera className="w-3.5 h-3.5" />
-                        Capture & Save Photo
+                        <Camera className="w-3.5 h-3.5 text-slate-700" />
+                        <span>Take & Save Photo</span>
                       </button>
                     </>
                   ) : (
                     <>
-                      <p className="text-emerald-400 font-bold flex items-center gap-1.5">
+                      <div className="text-emerald-400 font-medium flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4" />
-                        Photo captured and saved to local storage!
-                      </p>
-                      <p className="text-[11px] text-slate-300">
-                        Your identity verification has been confirmed and stored in local storage for this recruitment assessment session.
+                        <span>Identity snapshot verified and stored in local session.</span>
+                      </div>
+                      <p className="text-slate-400 text-xs leading-relaxed">
+                        Your identity has been confirmed for this examination session. You may retake the photo if you wish to adjust the frame.
                       </p>
                       <button
                         onClick={retakePhoto}
-                        className="flex items-center gap-1.5 text-cyber-primary text-xs hover:underline mt-1 font-semibold cursor-pointer"
+                        className="text-xs text-slate-300 hover:text-white underline inline-flex items-center gap-1.5 cursor-pointer pt-1"
                       >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                        Retake Photo
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Retake Photo</span>
                       </button>
                     </>
                   )}
                 </div>
+
               </div>
             )}
+
           </div>
 
           {/* Card 3: Fullscreen Gate */}
-          <div className="p-4 bg-cyber-panel-secondary border border-cyber-border flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/30">
-                <Maximize className="w-5 h-5 text-cyber-primary" />
+          <div className="p-5 rounded-lg bg-[#0A0E18] border border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-10 h-10 rounded-md bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-slate-300 shrink-0">
+                <Maximize2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs text-cyber-muted uppercase">FULLSCREEN ENFORCEMENT</p>
-                <p className="text-sm font-bold text-white">Browser Fullscreen Required</p>
-                <p className="text-[11px] text-cyber-muted">
-                  Exiting fullscreen during the mission triggers automated anti-cheat flags.
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
+                  Display Environment
+                </span>
+                <div className="text-sm font-semibold text-white mt-0.5">
+                  Mandatory Fullscreen Mode
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Continuous fullscreen is strictly enforced. Exiting fullscreen during a question will skip it with negative marking.
                 </p>
               </div>
             </div>
 
-            <div>
+            <div className="shrink-0 self-start sm:self-center">
               {fullscreenReady ? (
-                <div className="flex items-center gap-2 text-cyber-success text-xs font-bold">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span>FULLSCREEN READY</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Fullscreen Active</span>
                 </div>
               ) : (
                 <button
                   onClick={requestFullscreen}
-                  className="px-4 py-2 border border-cyber-primary text-cyber-primary text-xs hover:bg-cyber-primary hover:text-black font-bold transition-all"
+                  className="px-4 py-2 rounded-md bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs transition-colors cursor-pointer"
                 >
-                  ENTER FULLSCREEN
+                  Enter Fullscreen
                 </button>
               )}
             </div>
           </div>
 
-          {/* Critical Assessment Guidelines Card */}
-          <div className="p-4 bg-[#080C14] border border-cyber-primary/40 rounded-lg space-y-3 shadow-lg">
-            <div className="flex items-center gap-2 text-xs font-bold text-cyber-primary uppercase tracking-wider">
-              <FileText className="w-4 h-4 text-cyber-primary" />
-              <span>TEST GUIDELINES & RULES (PLEASE READ CAREFULLY)</span>
+          {/* Card 4: Assessment Instructions & Integrity Policy */}
+          <div className="p-5 rounded-lg bg-[#0A0E18] border border-white/[0.08] space-y-3">
+            <div className="flex items-center gap-2 text-xs font-semibold text-white pb-1 border-b border-white/[0.06]">
+              <FileText className="w-4 h-4 text-slate-400" />
+              <span>Assessment Guidelines & Integrity Rules</span>
             </div>
-            <ul className="text-xs text-cyber-text space-y-2 leading-relaxed">
-              <li className="flex items-start gap-2">
-                <span className="text-cyber-warning font-bold">⚠️</span>
-                <span>
-                  <strong className="text-cyber-warning">STRICT FULLSCREEN:</strong> Do NOT exit fullscreen or switch tabs. Exiting fullscreen will <span className="text-cyber-danger font-bold">SKIP your current question</span> with a <span className="text-cyber-danger font-bold">NEGATIVE MARKING (-50 PTS)</span> penalty!
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-cyber-primary font-bold">📹</span>
-                <span>
-                  <strong className="text-cyber-primary">LIVE CAMERA PROCTORING:</strong> Your webcam will be displayed and actively monitored in the HUD throughout the test.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-white font-bold">⌨️</span>
-                <span>
-                  <strong className="text-white">ANSWER & PROGRESS:</strong> Click with mouse cursor or press keys <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border rounded font-bold">A</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border rounded font-bold">B</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border rounded font-bold">C</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border rounded font-bold">D</kbd>. Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border rounded font-bold">ENTER</kbd> to submit and proceed to next.
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-cyber-danger font-bold">🚫</span>
-                <span>
-                  <strong className="text-cyber-danger">ANTI-CHEAT LOCKDOWN:</strong> Tab switching, right-click, copy-pasting, and text selection are strictly prohibited and automatically flagged.
-                </span>
-              </li>
-            </ul>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
+              
+              <div className="p-3 rounded-md bg-[#060911] border border-white/[0.05] space-y-1">
+                <div className="font-semibold text-white flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Continuous Fullscreen Enforced</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Do not exit fullscreen or switch tabs. Any exit while answering an active challenge results in immediate skip and a <strong className="text-rose-400">-50 PTS penalty</strong>.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-[#060911] border border-white/[0.05] space-y-1">
+                <div className="font-semibold text-white flex items-center gap-1.5">
+                  <Video className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                  <span>Live Proctoring Active</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Your webcam feed will remain active in the proctoring HUD throughout the evaluation session to ensure candidate verification.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-[#060911] border border-white/[0.05] space-y-1">
+                <div className="font-semibold text-white flex items-center gap-1.5">
+                  <MonitorCheck className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                  <span>Keyboard & Cursor Navigation</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Click options directly or press keys <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">D</kbd>, and press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white font-mono text-[10px]">ENTER</kbd> to submit.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-md bg-[#060911] border border-white/[0.05] space-y-1">
+                <div className="font-semibold text-white flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                  <span>Anti-Cheat Audit Log</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Tab blur, developer tools, and copy-pasting are automatically monitored and recorded in your candidate audit dossier.
+                </p>
+              </div>
+
+            </div>
           </div>
 
         </div>
 
-        {/* Start Button */}
-        <div className="mt-8 pt-6 border-t border-cyber-border flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-xs text-cyber-muted">
-            {isReadyToStart
-              ? 'All requirements satisfied. Operational clearance granted.'
-              : 'Complete all checks above to unlock operational clearance.'}
-          </span>
+        {/* Bottom Action Footer */}
+        <div className="p-5 rounded-lg bg-[#0A0E18] border border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-slate-400 text-center sm:text-left">
+            {isReadyToStart ? (
+              <span className="text-emerald-400 font-medium flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4" />
+                All checks passed. You may enter the assessment environment.
+              </span>
+            ) : (
+              <span>
+                Please enable camera, capture your photo, and enter fullscreen to proceed.
+              </span>
+            )}
+          </div>
 
           <button
             disabled={!isReadyToStart}
             onClick={handleStartOperation}
-            className={`w-full sm:w-auto px-8 py-4 font-bold text-sm tracking-wider flex items-center justify-center gap-2 transition-all ${
+            className={`w-full sm:w-auto h-11 px-7 rounded-md font-semibold text-xs tracking-wide flex items-center justify-center gap-2 transition-all ${
               isReadyToStart
-                ? 'bg-cyber-primary text-black hover:bg-white shadow-[0_0_20px_rgba(0,255,204,0.35)]'
-                : 'bg-cyber-panel-secondary border border-cyber-border text-cyber-muted cursor-not-allowed opacity-50'
+                ? 'bg-white hover:bg-slate-100 text-slate-900 cursor-pointer shadow-sm active:translate-y-0.5'
+                : 'bg-white/[0.05] text-slate-500 border border-white/[0.08] cursor-not-allowed opacity-60'
             }`}
           >
-            <Play className="w-4 h-4 fill-current" />
-            ENTER OPERATION ZERO-DAY
+            <span>Start Technical Assessment</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-      </div>
+      </main>
+
+      {/* Footer Attribution */}
+      <footer className="max-w-4xl w-full mx-auto pt-6 text-center text-xs text-slate-500 border-t border-white/[0.08]">
+        Samrat Ashok Technological Institute (SATI), Vidisha &bull; Cyber Cell Recruitment Engine 2026
+      </footer>
+
     </div>
   );
 }
