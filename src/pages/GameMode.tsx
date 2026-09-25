@@ -16,7 +16,6 @@ import {
   Trophy,
   Sparkles,
   Shield,
-  Layers,
   VideoOff
 } from 'lucide-react';
 import { isBrowserFullscreen, FULLSCREEN_EVENTS } from '../utils/fullscreen';
@@ -329,12 +328,13 @@ export default function GameMode() {
         </div>
       )}
 
-      {/* Proximity Aim Target */}
+      {/* Proximity Aim Target / Interaction Prompt */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 font-sans">
         {inRangeOfTerminal ? (
           <div className="flex flex-col items-center gap-1.5 animate-scaleIn">
-            <span className="text-xs font-semibold text-slate-950 bg-white px-3 py-1 rounded-md shadow-sm">
-              [E] OPEN CASE FILE
+            <span className="text-xs font-semibold text-slate-950 bg-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-sky-500" />
+              Press [E] or Click to Open Terminal
             </span>
           </div>
         ) : (
@@ -342,141 +342,100 @@ export default function GameMode() {
         )}
       </div>
 
-      {/* Top Level Progression Bar */}
-      <div className="absolute top-0 inset-x-0 z-30 pointer-events-none p-3 md:p-5 flex flex-col gap-2 font-sans">
+      {/* Sleek Unified Top Navigation Bar */}
+      <header className="fixed top-0 inset-x-0 z-30 px-4 sm:px-6 py-3 bg-[#080C14]/90 backdrop-blur-md border-b border-white/[0.08] flex items-center justify-between font-sans pointer-events-auto shadow-sm">
         
-        {/* Top Navbar Row */}
-        <div className="flex justify-between items-center pointer-events-auto">
-          {/* Club Logo */}
-          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center gap-3">
-            <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-            <div>
-              <h1 className="text-xs md:text-sm font-bold text-white tracking-wide">
-                CYBER CELL • SATI VIDISHA
-              </h1>
-              <p className="text-[10px] text-slate-400 font-mono">OPERATION ZERO-DAY</p>
-            </div>
+        {/* Left: Organization Identity */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#0F172A] border border-white/[0.1] flex items-center justify-center font-mono text-xs font-bold text-sky-400">
+            CC
           </div>
-
-          {/* Level Tracker Badge */}
-          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center gap-3">
-            <Layers className="w-4 h-4 text-sky-400" />
-            <div>
-              <span className="text-[10px] text-slate-400 uppercase block leading-none font-mono">ACTIVE LEVEL</span>
-              <span className="text-sm font-semibold text-white">LEVEL {currentMissionIndex + 1} OF {missions.length}</span>
-            </div>
-          </div>
-
-          {/* Clock */}
-          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl text-right flex items-center gap-3">
-            <Clock className="w-4 h-4 text-amber-400" />
-            <div>
-              <span className="text-[10px] text-slate-400 uppercase block leading-none font-mono">TIME REMAINING</span>
-              <span className={`text-sm font-mono font-semibold tracking-wider ${
-                timeRemainingSeconds < 300 ? 'text-red-400 animate-pulse' : 'text-slate-100'
-              }`}>
-                {formatTimer(timeRemainingSeconds)}
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold tracking-tight text-white uppercase">
+                CYBER CELL
+              </span>
+              <span className="text-[10px] text-sky-400 font-mono px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
+                SOC
               </span>
             </div>
+            <p className="text-[10px] text-slate-400 font-mono">Stage 01 A • Screening</p>
           </div>
         </div>
 
-        {/* 7-Level Step Indicator Bar */}
-        <div className="px-4 py-2.5 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center justify-between gap-1 overflow-x-auto pointer-events-auto">
-          {missions.map((m, idx) => {
-            const isCompleted = idx < currentMissionIndex;
-            const isCurrent = idx === currentMissionIndex;
-            return (
-              <div key={m.id} className="flex items-center gap-1.5 flex-1 min-w-[90px]">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
-                  isCompleted 
-                    ? 'bg-emerald-500 text-slate-950' 
-                    : isCurrent 
-                    ? 'bg-sky-400 text-slate-950 font-bold ring-2 ring-sky-400/30' 
-                    : 'bg-white/[0.05] text-slate-400 border border-white/10'
-                }`}>
-                  {isCompleted ? '✓' : idx + 1}
-                </div>
-                <div className="flex flex-col truncate">
-                  <span className={`text-[10px] font-semibold leading-tight truncate ${
-                    isCurrent ? 'text-sky-300' : isCompleted ? 'text-emerald-400' : 'text-slate-400'
-                  }`}>
-                    L{idx + 1}: {m.title.split(':')[1]?.trim() || m.title}
-                  </span>
-                  <span className="text-[9px] text-slate-500 uppercase font-mono">
-                    {m.difficulty}
-                  </span>
-                </div>
-                {idx < missions.length - 1 && (
-                  <div className={`h-0.5 flex-1 mx-1 ${isCompleted ? 'bg-emerald-500/40' : 'bg-white/10'}`} />
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-      </div>
-
-      {/* Bottom HUD Bar */}
-      <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none p-3 md:p-5 flex justify-between items-end font-sans">
-        
-        {/* Real-time Case Telemetry Log */}
-        <div className="w-72 md:w-96 p-3 bg-[#090D18]/90 border border-white/[0.08] backdrop-blur-md rounded-xl pointer-events-auto">
-          <div className="flex items-center justify-between border-b border-white/[0.06] pb-1.5 mb-2">
-            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
-              <Activity className="w-3.5 h-3.5 text-sky-400" />
-              CASE TELEMETRY
+        {/* Center: Clean Level Progression & Minimalist Pips */}
+        <div className="hidden md:flex flex-col items-center gap-1.5">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="font-semibold text-white">
+              Level {currentMissionIndex + 1} of {missions.length}
             </span>
-            <span className="text-[9px] text-emerald-400 font-mono">CONNECTED</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-slate-300 font-medium">
+              {currentMission.title.split(':')[1]?.trim() || currentMission.title}
+            </span>
           </div>
-          <div className="space-y-1 text-[11px] h-20 overflow-y-auto leading-relaxed font-mono">
-            {logs.map((log, idx) => (
-              <p key={idx} className={idx === 0 ? 'text-sky-300 font-medium' : 'text-slate-400'}>
-                {log}
-              </p>
-            ))}
-          </div>
-          <div className="mt-2 pt-2 border-t border-white/[0.06] text-[10px] text-amber-400/90 leading-snug">
-            💡 Case Clue: {currentMission.terminalHint}
+          
+          <div className="flex items-center gap-1.5">
+            {missions.map((m, idx) => {
+              const isCompleted = idx < currentMissionIndex;
+              const isCurrent = idx === currentMissionIndex;
+              return (
+                <div
+                  key={m.id}
+                  title={`Level ${idx + 1}: ${m.title}`}
+                  className={`h-1.5 rounded-full transition-all ${
+                    isCurrent
+                      ? 'w-8 bg-sky-400 ring-2 ring-sky-400/30'
+                      : isCompleted
+                      ? 'w-6 bg-emerald-400'
+                      : 'w-5 bg-white/10'
+                  }`}
+                />
+              );
+            })}
           </div>
         </div>
 
-        {/* Score & Progression */}
-        <div className="flex flex-col items-end gap-2.5 pointer-events-auto">
-          <div className="cyber-panel px-6 py-2.5 bg-[#0B1018]/90 border border-cyber-border backdrop-blur-sm rounded flex items-center gap-5">
-            <div>
-              <span className="text-[10px] text-cyber-muted uppercase block leading-none">SCORE</span>
-              <span className="text-xl font-bold text-cyber-primary">{score}</span>
-            </div>
-            <div className="w-px h-7 bg-cyber-border" />
-            <div>
-              <span className="text-[10px] text-cyber-muted uppercase block leading-none">TACTICAL XP</span>
-              <span className="text-xl font-bold text-cyber-secondary">{xp}</span>
-            </div>
+        {/* Right: Timer, Score & End Action */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-lg">
+            <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <span className={`font-mono font-semibold ${timeRemainingSeconds < 300 ? 'text-red-400 animate-pulse' : 'text-slate-200'}`}>
+              {formatTimer(timeRemainingSeconds)}
+            </span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-lg">
+            <span className="text-[10px] uppercase font-mono text-slate-400">Score</span>
+            <span className="font-bold text-white font-mono">{score}</span>
           </div>
 
           <button
-            onClick={() => navigate('/result')}
-            className="px-4 py-2 bg-cyber-danger/15 border border-cyber-danger text-cyber-danger hover:bg-cyber-danger hover:text-black text-xs font-bold uppercase tracking-wider rounded transition-all"
+            onClick={() => {
+              if (window.confirm('Are you sure you want to finish Round 01 A and view your scorecard?')) {
+                navigate('/result');
+              }
+            }}
+            className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 text-xs font-medium transition-colors cursor-pointer"
           >
-            END ASSESSMENT & SUBMIT →
+            End Assessment
           </button>
         </div>
 
-      </div>
+      </header>
 
-      {/* Live Proctoring Webcam Feed */}
-      <div className="fixed top-28 right-4 z-40 bg-[#0B1018]/95 border border-cyber-primary/40 backdrop-blur-md rounded-lg p-2.5 shadow-[0_0_25px_rgba(0,255,204,0.15)] flex flex-col gap-1.5 w-44 pointer-events-auto">
-        <div className="flex items-center justify-between">
+      {/* Live Proctoring Webcam Corner Card */}
+      <div className="fixed top-18 right-5 z-30 bg-[#0D1322]/90 backdrop-blur-md border border-white/[0.1] rounded-xl p-2.5 shadow-xl flex flex-col gap-2 w-44 pointer-events-auto font-sans">
+        <div className="flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            <span className="text-[9px] font-bold text-red-400 tracking-wider">PROCTORING</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span className="font-semibold text-white">Proctoring</span>
           </div>
-          <span className="text-[8px] text-cyber-primary font-mono-cyber uppercase">
-            {cameraActive ? 'LIVE • OK' : 'CONNECTING'}
+          <span className="text-[10px] text-slate-400 font-mono uppercase">
+            {cameraActive ? 'Active' : 'Offline'}
           </span>
         </div>
-        <div className="w-full h-28 bg-black rounded border border-cyber-border overflow-hidden relative flex items-center justify-center">
+        <div className="w-full h-28 bg-black rounded-lg border border-white/[0.08] overflow-hidden relative flex items-center justify-center">
           <video
             ref={proctorVideoRef}
             autoPlay
@@ -485,11 +444,35 @@ export default function GameMode() {
             className={`w-full h-full object-cover scale-x-[-1] ${cameraActive ? 'block' : 'hidden'}`}
           />
           {!cameraActive && (
-            <div className="flex flex-col items-center justify-center gap-1 text-cyber-muted p-2 text-center">
-              <VideoOff className="w-5 h-5 text-cyber-danger animate-pulse" />
-              <span className="text-[8px] text-cyber-danger font-bold">CONNECTING CAM...</span>
+            <div className="flex flex-col items-center justify-center gap-1 text-slate-400 p-2 text-center">
+              <VideoOff className="w-5 h-5 text-red-400" />
+              <span className="text-[10px]">Camera Connecting...</span>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Bottom Telemetry & Case Briefing Card */}
+      <div className="fixed bottom-5 left-5 z-20 w-80 sm:w-96 p-4 bg-[#0D1322]/90 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-2xl pointer-events-auto font-sans">
+        <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-2.5">
+          <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+            <Activity className="w-3.5 h-3.5 text-sky-400" />
+            Case Telemetry
+          </span>
+          <span className="text-[10px] text-emerald-400 font-mono font-medium">LIVE STREAM</span>
+        </div>
+        
+        <div className="space-y-1 text-xs h-20 overflow-y-auto leading-relaxed font-mono">
+          {logs.map((log, idx) => (
+            <p key={idx} className={idx === 0 ? 'text-sky-300 font-medium' : 'text-slate-400'}>
+              {log}
+            </p>
+          ))}
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] text-xs text-amber-300/90 leading-snug flex items-start gap-1.5">
+          <span className="shrink-0">💡</span>
+          <span><strong>Case Objective:</strong> {currentMission.terminalHint}</span>
         </div>
       </div>
 
@@ -504,56 +487,56 @@ export default function GameMode() {
 
       {/* Round 1 Completion Transition Modal */}
       {showRound1CompleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md pointer-events-auto p-4 select-none font-mono-cyber">
-          <div className="w-full max-w-xl cyber-panel p-8 border-2 border-cyber-primary text-center shadow-[0_0_60px_rgba(0,255,204,0.3)] rounded-lg animate-scaleIn">
-            <div className="w-16 h-16 rounded-full bg-cyber-primary/20 border border-cyber-primary flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,255,204,0.3)]">
-              <Trophy className="w-8 h-8 text-cyber-primary" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-[#0D1322] p-8 border border-white/[0.1] text-center shadow-2xl rounded-2xl animate-scaleIn">
+            <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-7 h-7 text-sky-400" />
             </div>
 
-            <span className="text-[10px] uppercase font-bold tracking-widest px-3 py-1 bg-cyber-primary/10 border border-cyber-primary/30 text-cyber-primary rounded inline-block mb-2">
+            <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-md inline-block mb-2">
               SOC OPERATIONS COMPLETE
             </span>
 
-            <h3 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-tight">
-              ROUND 01 A DEBRIEF COMPLETE
+            <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight">
+              Round 01 A Debrief Complete
             </h3>
 
-            <p className="text-xs text-cyber-muted mt-2 max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
               All 30 SOC screening questions and scenarios resolved. Your tactical performance baseline has been captured.
             </p>
 
-            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded bg-[#090E1A] border border-cyber-border text-left">
+            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded-xl bg-[#090D18] border border-white/[0.06] text-left">
               <div>
-                <span className="text-[10px] text-cyber-muted uppercase block">SCORE EARNED</span>
-                <span className="text-2xl font-bold text-cyber-primary font-mono">{score} PTS</span>
+                <span className="text-[10px] text-slate-400 uppercase block font-mono">Score Earned</span>
+                <span className="text-xl font-bold text-white font-mono">{score} PTS</span>
               </div>
               <div>
-                <span className="text-[10px] text-cyber-muted uppercase block">XP PROGRESSION</span>
-                <span className="text-2xl font-bold text-cyber-secondary font-mono">{xp} XP</span>
+                <span className="text-[10px] text-slate-400 uppercase block font-mono">XP Progression</span>
+                <span className="text-xl font-bold text-indigo-400 font-mono">{xp} XP</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate('/technical-profile')}
-                className="w-full py-4 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider rounded hover:bg-white transition-all shadow-[0_0_25px_rgba(0,255,204,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4" />
-                ENTER ROUND 01 B: PERSONALIZED SKILL PROFILING &rarr;
+                <Sparkles className="w-4 h-4 text-sky-600" />
+                <span>ENTER ROUND 01 B: SKILL PROFILING &rarr;</span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => navigate('/result')}
-                  className="py-2.5 px-3 bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
                   View Scorecard
                 </button>
                 <button
                   onClick={() => navigate('/arcade')}
-                  className="py-2.5 px-3 bg-white/5 hover:bg-white/10 text-amber-400 border border-amber-400/30 font-bold text-xs uppercase tracking-wider rounded transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-white/[0.05] hover:bg-white/[0.1] text-amber-400 border border-amber-400/20 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
-                  Play Arcade Puzzles
+                  Bonus Labs
                 </button>
               </div>
             </div>
@@ -563,21 +546,21 @@ export default function GameMode() {
 
       {/* Anti-Cheat Warning Modal */}
       {warningNotice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md pointer-events-auto p-4 select-none font-mono-cyber">
-          <div className="w-full max-w-lg cyber-panel p-6 border-2 border-cyber-danger text-center shadow-[0_0_50px_rgba(239,68,68,0.5)] rounded-lg animate-scaleIn">
-            <div className="w-14 h-14 rounded-full bg-cyber-danger/20 border border-cyber-danger flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <AlertTriangle className="w-8 h-8 text-cyber-danger" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-[#0D1322] p-6 border border-red-500/40 text-center shadow-2xl rounded-2xl animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-400" />
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-cyber-danger uppercase tracking-wider">
-              INTEGRITY VIOLATION RECORDED
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+              Integrity Violation Recorded
             </h3>
-            <div className="mt-4 p-4 bg-black/70 border border-cyber-danger/40 rounded text-left text-xs text-cyber-text whitespace-pre-line leading-relaxed">
+            <div className="mt-4 p-4 bg-[#080C14] border border-red-500/20 rounded-xl text-left text-xs text-slate-200 whitespace-pre-line leading-relaxed">
               {warningNotice.message}
             </div>
             <div className="mt-6 flex flex-col gap-2.5">
               <button
                 onClick={restoreFullscreen}
-                className="w-full py-3.5 bg-cyber-danger hover:bg-red-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] cursor-pointer"
+                className="w-full py-3 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm cursor-pointer"
               >
                 <Maximize2 className="w-4 h-4" />
                 RESTORE FULLSCREEN & CONTINUE
