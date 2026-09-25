@@ -27,6 +27,18 @@ export default function PreCheck() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Check for previously saved photo in localStorage
+  useEffect(() => {
+    try {
+      const savedPhoto = localStorage.getItem('candidate_photo');
+      if (savedPhoto && savedPhoto.startsWith('data:image/')) {
+        setCapturedPhotoUrl(savedPhoto);
+      }
+    } catch (e) {
+      console.warn('Could not read photo from localStorage:', e);
+    }
+  }, []);
+
   useEffect(() => {
     // If recruitment mode and no candidate, redirect to login
     if (mode === 'recruitment' && !candidate) {
@@ -50,26 +62,53 @@ export default function PreCheck() {
     };
   }, []);
 
-  // Request camera permission
+  // Request camera permission and attach live feed
   const requestCamera = async () => {
     setErrorMsg('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+        audio: false
       });
       streamRef.current = stream;
+      setCameraPermission('granted');
+
+      // Immediate attachment if element is already present
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(e => console.warn('Video play error:', e));
       }
-      setCameraPermission('granted');
     } catch (err: any) {
-      console.error(err);
+      console.error('Camera access error:', err);
       setCameraPermission('denied');
       setErrorMsg('Camera permission denied or camera not found. Camera is required for identity integrity.');
     }
   };
 
-  // Capture single verification photo
+  // Guarantee video element receives the stream as soon as it mounts or changes
+  useEffect(() => {
+    if (cameraPermission === 'granted' && streamRef.current && videoRef.current) {
+      const video = videoRef.current;
+      if (video.srcObject !== streamRef.current) {
+        video.srcObject = streamRef.current;
+      }
+      video.onloadedmetadata = () => {
+        video.play().catch(err => console.warn('Video playback warning:', err));
+      };
+      video.play().catch(err => console.warn('Video playback warning:', err));
+    }
+  }, [cameraPermission, capturedPhotoUrl]);
+
+  // Cleanup stream on component unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  // Capture single verification photo and save to localStorage
   const capturePhoto = () => {
     if (!videoRef.current) return;
     const video = videoRef.current;
@@ -80,10 +119,22 @@ export default function PreCheck() {
     if (!ctx) return;
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     setCapturedPhotoUrl(dataUrl);
 
-    // Save to IndexedDB
+    // Save to localStorage as requested by user
+    try {
+      localStorage.setItem('candidate_photo', dataUrl);
+      localStorage.setItem('candidate_photo_captured_at', new Date().toISOString());
+      if (candidate) {
+        localStorage.setItem(`candidate_photo_${candidate.id}`, dataUrl);
+        localStorage.setItem(`candidate_photo_${candidate.scholarNumber}`, dataUrl);
+      }
+    } catch (e) {
+      console.warn('Could not save photo to localStorage:', e);
+    }
+
+    // Save to IndexedDB for audit trail
     if (candidate) {
       savePhoto({
         candidateId: candidate.id,
@@ -97,6 +148,15 @@ export default function PreCheck() {
 
   const retakePhoto = () => {
     setCapturedPhotoUrl(null);
+    try {
+      localStorage.removeItem('candidate_photo');
+      if (candidate) {
+        localStorage.removeItem(`candidate_photo_${candidate.id}`);
+        localStorage.removeItem(`candidate_photo_${candidate.scholarNumber}`);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
   };
 
   const requestFullscreen = async () => {
@@ -107,7 +167,7 @@ export default function PreCheck() {
   };
 
   const handleStartOperation = async () => {
-    // Stop camera video track after verification
+    // Stop camera video track after verification before entering game
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
     }
@@ -215,32 +275,65 @@ export default function PreCheck() {
 
             {/* Video stream or Captured photo preview */}
             {cameraPermission === 'granted' && (
-              <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/60 p-3 border border-cyber-border">
-                {!capturedPhotoUrl ? (
-                  <div className="w-48 h-36 bg-black border border-cyber-primary/40 relative overflow-hidden">
-                    <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-                    <span className="absolute bottom-1 left-1 text-[9px] bg-black/80 px-1 text-cyber-primary">
-                      LIVE STREAM
-                    </span>
-                  </div>
-                ) : (
-                  <div className="w-48 h-36 bg-black border border-cyber-success/50 relative overflow-hidden">
-                    <img src={capturedPhotoUrl} alt="Identity Snapshot" className="w-full h-full object-cover" />
-                    <span className="absolute bottom-1 left-1 text-[9px] bg-cyber-success text-black font-bold px-1">
-                      VERIFIED SNAPSHOT
-                    </span>
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/60 p-4 border border-cyber-border rounded-lg">
+                <div className="w-56 h-40 bg-black border border-cyber-primary/40 rounded overflow-hidden relative shadow-inner">
+                  {/* Keep video element mounted in DOM so stream remains playing */}
+                  <video 
+                    ref={videoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    className={`w-full h-full object-cover transform -scale-x-100 ${capturedPhotoUrl ? 'hidden' : 'block'}`} 
+                  />
+                  
+                  {capturedPhotoUrl && (
+                    <img 
+                      src={capturedPhotoUrl} 
+                      alt="Candidate Identity Snapshot" 
+                      className="w-full h-full object-cover transform -scale-x-100" 
+                    />
+                  )}
+
+                  {!capturedPhotoUrl ? (
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/80 px-2 py-0.5 rounded text-[10px] text-cyber-primary border border-cyber-primary/30">
+                      <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                      <span>LIVE WEBCAM</span>
+                    </div>
+                  ) : (
+                    <div className="absolute bottom-2 left-2 flex items-center gap-1.5 bg-black/90 px-2 py-0.5 rounded text-[10px] text-cyber-success border border-cyber-success/40">
+                      <CheckCircle2 className="w-3 h-3 text-cyber-success" />
+                      <span>SAVED SNAPSHOT</span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="flex-1 text-xs text-cyber-muted space-y-2">
                   {!capturedPhotoUrl ? (
-                    <p>Position your face clearly in the frame, then click <strong>CAPTURE PHOTO</strong>.</p>
+                    <>
+                      <p className="text-white font-medium">Position your face clearly inside the frame.</p>
+                      <p className="text-[11px] text-slate-400">
+                        Ensure good lighting and centered posture. Click <strong>Capture Photo</strong> to verify your identity and save the snapshot.
+                      </p>
+                      <button
+                        onClick={capturePhoto}
+                        className="px-4 py-2 bg-cyber-primary text-black text-xs font-bold hover:bg-white transition-all shadow-[0_0_12px_rgba(0,255,204,0.3)] rounded mt-1 flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        Capture & Save Photo
+                      </button>
+                    </>
                   ) : (
                     <>
-                      <p className="text-cyber-text">Photo captured successfully and verified against candidate registration.</p>
+                      <p className="text-emerald-400 font-bold flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Photo captured and saved to local storage!
+                      </p>
+                      <p className="text-[11px] text-slate-300">
+                        Your identity verification has been confirmed and stored in local storage for this recruitment assessment session.
+                      </p>
                       <button
                         onClick={retakePhoto}
-                        className="flex items-center gap-1.5 text-cyber-primary text-xs hover:underline mt-1"
+                        className="flex items-center gap-1.5 text-cyber-primary text-xs hover:underline mt-1 font-semibold cursor-pointer"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         Retake Photo
