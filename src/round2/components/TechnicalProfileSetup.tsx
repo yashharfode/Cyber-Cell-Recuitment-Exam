@@ -117,12 +117,18 @@ export default function TechnicalProfileSetup() {
 
     const blueprint = generateAssessmentBlueprint(profile);
 
-    // Save profile and blueprint to sessionStorage for robust recovery
-    sessionStorage.setItem('r2_profile', JSON.stringify(profile));
-    sessionStorage.setItem('r2_blueprint', JSON.stringify(blueprint));
+    try {
+      localStorage.setItem('round2_profile', JSON.stringify(profile));
+      localStorage.setItem('round2_blueprint', JSON.stringify(blueprint));
+    } catch (e) {
+      console.error(e);
+    }
 
-    // Request fullscreen immediately from user click gesture
-    await enterBrowserFullscreen();
+    try {
+      await enterBrowserFullscreen();
+    } catch (e) {
+      console.warn('Could not auto-request fullscreen:', e);
+    }
 
     navigate('/round2-assessment');
   };
@@ -130,63 +136,62 @@ export default function TechnicalProfileSetup() {
   const requiresLanguageSelect = selectedDomains.includes('PROGRAMMING') || selectedDomains.includes('DSA');
 
   return (
-    <div className="min-h-screen bg-[#05070D] text-cyber-text p-4 md:p-8 font-mono-cyber">
-      <div className="max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-8 font-sans selection:bg-sky-100 selection:text-sky-900">
+      <div className="max-w-5xl mx-auto space-y-8">
         
-        {/* Header Banner & Step Wizard */}
-        <div className="cyber-panel p-6 md:p-8 border border-cyber-border rounded-lg relative overflow-hidden shadow-2xl">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-cyber-border pb-6">
+        {/* Top Header Card */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
-              <div className="flex items-center gap-2 text-cyber-primary text-xs uppercase tracking-widest">
-                <Shield className="w-4 h-4 text-cyber-primary" />
-                CYBER CELL • SATI VIDISHA
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mt-1">
-                ROUND 01 B: TECHNICAL SKILL PROFILING
+              <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-md font-semibold inline-block mb-1.5">
+                ROUND 01 B • TECHNICAL PROFILING
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 uppercase">
+                DECLARE YOUR TECHNICAL SKILLS
               </h1>
-              <p className="text-xs text-cyber-muted mt-1 max-w-2xl leading-relaxed">
-                Choose the technical skills you genuinely know. The system will build a custom 25-minute assessment tailored specifically to your selections.
+              <p className="text-xs text-slate-500 mt-1">
+                Candidate: <strong className="text-slate-900">{candidate?.name || 'Guest Candidate'}</strong> ({candidate?.scholarNumber || 'DEMO-01'})
               </p>
             </div>
-            <div className="px-3 py-1.5 bg-cyber-primary/10 border border-cyber-primary text-cyber-primary text-xs font-bold rounded shrink-0">
+            <div className="px-3 py-1.5 bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold rounded-lg shrink-0">
               PHASE 2 OF RECRUITMENT
             </div>
           </div>
 
           {/* 3-Step Simple Visual Guide */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-5">
-            <div className="p-3 bg-cyber-primary/10 border border-cyber-primary/40 rounded flex items-center gap-2.5">
-              <span className="w-6 h-6 rounded-full bg-cyber-primary text-black font-extrabold flex items-center justify-center text-xs">1</span>
+            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded-full bg-sky-600 text-white font-extrabold flex items-center justify-center text-xs">1</span>
               <div>
-                <span className="text-xs font-bold text-white block">Step 1: Pick Domains</span>
-                <span className="text-[10px] text-cyber-muted">Choose 1 to 9 skills you know</span>
+                <span className="text-xs font-bold text-slate-900 block">Step 1: Pick Domains</span>
+                <span className="text-[10px] text-slate-500">Choose 1 to 9 skills you know</span>
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B1018] border border-cyber-border rounded flex items-center gap-2.5">
-              <span className="w-6 h-6 rounded-full bg-white/10 text-white font-bold flex items-center justify-center text-xs">2</span>
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs">2</span>
               <div>
-                <span className="text-xs font-bold text-white block">Step 2: Sub-Skills & Level</span>
-                <span className="text-[10px] text-cyber-muted">Rate confidence & pick topics</span>
+                <span className="text-xs font-bold text-slate-900 block">Step 2: Sub-Skills & Level</span>
+                <span className="text-[10px] text-slate-500">Rate confidence & pick topics</span>
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B1018] border border-cyber-border rounded flex items-center gap-2.5">
-              <span className="w-6 h-6 rounded-full bg-white/10 text-white font-bold flex items-center justify-center text-xs">3</span>
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2.5">
+              <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs">3</span>
               <div>
-                <span className="text-xs font-bold text-white block">Step 3: Launch Test</span>
-                <span className="text-[10px] text-cyber-muted">Fullscreen 25-min calibrated lab</span>
+                <span className="text-xs font-bold text-slate-900 block">Step 3: Launch Test</span>
+                <span className="text-[10px] text-slate-500">Fullscreen 25-min calibrated lab</span>
               </div>
             </div>
           </div>
 
           {/* Reassuring Fairness Notice */}
-          <div className="mt-3 p-3.5 bg-[#080C14] border border-cyber-primary/40 rounded flex items-start gap-3 text-xs leading-relaxed">
-            <AlertCircle className="w-4 h-4 text-cyber-primary shrink-0 mt-0.5" />
+          <div className="mt-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-3 text-xs leading-relaxed">
+            <AlertCircle className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
             <div>
-              <strong className="text-white">Fairness Guarantee: </strong>
-              <span className="text-slate-300">
-                You do NOT need to select every skill! Selecting only what you know does NOT lower your score. Unselected domains are recorded as <strong className="text-cyber-muted font-mono-cyber">NOT_ASSESSED</strong>, never zero.
+              <strong className="text-slate-900">Fairness Guarantee: </strong>
+              <span className="text-slate-600">
+                You do NOT need to select every skill! Selecting only what you know does NOT lower your score. Unselected domains are recorded as <strong className="text-slate-800 font-mono">NOT_ASSESSED</strong>, never zero.
               </span>
             </div>
           </div>
@@ -195,11 +200,11 @@ export default function TechnicalProfileSetup() {
         {/* Step 1: Major Domains Grid */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-cyber-primary text-black flex items-center justify-center text-xs font-bold">1</span>
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">1</span>
               SELECT TECHNICAL DOMAINS ({selectedDomains.length} SELECTED)
             </h2>
-            <span className="text-[11px] text-cyber-muted">Click to select/unselect domains</span>
+            <span className="text-[11px] text-slate-500">Click to select/unselect domains</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -211,27 +216,27 @@ export default function TechnicalProfileSetup() {
                 <div
                   key={dom.id}
                   onClick={() => toggleDomain(dom.id)}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer transform hover:scale-[1.01] active:scale-[0.99] flex flex-col justify-between select-none ${
+                  className={`p-4 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
                     isSelected
-                      ? 'bg-cyber-primary/10 border-cyber-primary shadow-[0_0_20px_rgba(0,255,204,0.15)]'
-                      : 'bg-[#0B1018] border-cyber-border hover:border-cyber-primary/40 text-cyber-muted'
+                      ? 'bg-sky-50/70 border-2 border-sky-500 shadow-xs'
+                      : 'bg-white border-slate-200 hover:border-slate-300 text-slate-600'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2.5">
-                      <div className={`p-2 rounded border ${isSelected ? 'bg-cyber-primary/20 border-cyber-primary text-cyber-primary' : 'bg-black border-cyber-border text-cyber-muted'}`}>
+                      <div className={`p-2 rounded-lg border ${isSelected ? 'bg-sky-100 border-sky-200 text-sky-700' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-cyber-primary text-black border-cyber-primary' : 'border-cyber-border'}`}>
+                      <div className={`w-5 h-5 rounded border flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-sky-600 text-white border-sky-600' : 'border-slate-300 text-transparent'}`}>
                         {isSelected && '✓'}
                       </div>
                     </div>
-                    <h3 className="text-sm font-bold text-white tracking-wide">{dom.title}</h3>
-                    <p className="text-[11px] text-cyber-muted mt-1 leading-snug">{dom.tagline}</p>
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight">{dom.title}</h3>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug">{dom.tagline}</p>
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-cyber-border/60 flex items-center justify-between text-[10px]">
-                    <span className={isSelected ? 'text-cyber-primary font-bold' : 'text-cyber-muted'}>
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                    <span className={isSelected ? 'text-sky-700 font-bold' : 'text-slate-400 font-medium'}>
                       {isSelected ? 'ACTIVE IN PROFILE' : 'CLICK TO ADD'}
                     </span>
                     {isSelected && (
@@ -241,7 +246,7 @@ export default function TechnicalProfileSetup() {
                           e.stopPropagation();
                           setExpandedDomain(expandedDomain === dom.id ? null : dom.id);
                         }}
-                        className="text-cyber-primary hover:underline flex items-center gap-0.5"
+                        className="text-sky-700 hover:underline flex items-center gap-0.5 font-semibold"
                       >
                         <span>Configure</span>
                         {expandedDomain === dom.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -254,14 +259,14 @@ export default function TechnicalProfileSetup() {
           </div>
         </div>
 
-        {/* Step 2 & 3: Selected Domain Details Accordions (Sub-skills & Self-Rating) */}
+        {/* Step 2 & 3: Selected Domain Details Accordions */}
         <div className="space-y-4">
           <div className="flex items-center justify-between pt-2">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-cyber-primary text-black flex items-center justify-center text-xs font-bold">2</span>
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">2</span>
               CONFIGURE SUB-SKILLS & SELF-RATED CONFIDENCE
             </h2>
-            <span className="text-[11px] text-cyber-muted">Calibrate question range for chosen domains</span>
+            <span className="text-[11px] text-slate-500">Calibrate question range for chosen domains</span>
           </div>
 
           {selectedDomains.map((domainId) => {
@@ -272,38 +277,38 @@ export default function TechnicalProfileSetup() {
             const Icon = ICON_MAP[dom.iconName] || Code;
 
             return (
-              <div key={domainId} className="cyber-panel border border-cyber-border rounded-lg overflow-hidden">
+              <div key={domainId} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
                 {/* Header row */}
                 <div
                   onClick={() => setExpandedDomain(isExpanded ? null : domainId)}
-                  className="p-4 bg-[#0B1018] flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+                  className="p-4 bg-slate-50 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/30 rounded text-cyber-primary">
-                      <Icon className="w-4 h-4" />
+                    <div className="p-2 bg-sky-50 border border-sky-200 rounded-lg text-sky-700">
+                      <Icon className="w-4 h-4 text-sky-600" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white">{dom.title}</h3>
-                      <p className="text-[11px] text-cyber-muted">
-                        Rating: <strong className="text-cyber-primary uppercase">{currentRating}</strong> • {currentSubSkills.length} sub-skills selected
+                      <h3 className="text-sm font-bold text-slate-900">{dom.title}</h3>
+                      <p className="text-[11px] text-slate-500">
+                        Rating: <strong className="text-sky-700 uppercase">{currentRating}</strong> • {currentSubSkills.length} sub-skills selected
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-cyber-primary hidden sm:inline">
+                    <span className="text-xs text-sky-700 font-semibold hidden sm:inline">
                       {isExpanded ? 'Collapse' : 'Expand Sub-skills'}
                     </span>
-                    {isExpanded ? <ChevronUp className="w-4 h-4 text-cyber-muted" /> : <ChevronDown className="w-4 h-4 text-cyber-muted" />}
+                    {isExpanded ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
                   </div>
                 </div>
 
                 {/* Expanded configuration body */}
                 {isExpanded && (
-                  <div className="p-5 bg-[#05070D] border-t border-cyber-border space-y-5 animate-fadeIn">
+                  <div className="p-5 bg-white border-t border-slate-200 space-y-5 animate-fadeIn">
                     
                     {/* Self-Rating Selector */}
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-cyber-muted mb-2">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         How comfortable are you with {dom.title}?
                       </p>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -314,10 +319,10 @@ export default function TechnicalProfileSetup() {
                               key={level}
                               type="button"
                               onClick={() => setRating(domainId, level)}
-                              className={`py-2 px-3 text-xs uppercase font-bold rounded border transition-all ${
+                              className={`py-2 px-3 text-xs uppercase font-bold rounded-lg border transition-all cursor-pointer ${
                                 isLevelActive
-                                  ? 'bg-cyber-primary text-black border-cyber-primary shadow-[0_0_12px_rgba(0,255,204,0.3)]'
-                                  : 'bg-[#0B1018] border-cyber-border text-cyber-muted hover:text-white hover:border-cyber-primary/40'
+                                  ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                               }`}
                             >
                               {level}
@@ -325,20 +330,20 @@ export default function TechnicalProfileSetup() {
                           );
                         })}
                       </div>
-                      <p className="text-[10px] text-cyber-muted mt-1.5">
+                      <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
                         * Used to initialize baseline difficulty and evaluate self-perception vs demonstrated ability.
                       </p>
                     </div>
 
                     {/* Sub-skill Checkbox Groups */}
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wider text-cyber-muted mb-2">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
                         Which sub-skills have you genuinely worked with?
                       </p>
                       <div className="space-y-3">
                         {dom.subSkills.map((group, gIdx) => (
-                          <div key={gIdx} className="p-3 bg-[#0B1018] border border-cyber-border rounded space-y-2">
-                            <span className="text-[11px] font-bold text-cyber-primary uppercase tracking-wider block">
+                          <div key={gIdx} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                            <span className="text-[11px] font-bold text-sky-800 uppercase tracking-wider block">
                               {group.groupName}
                             </span>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -348,14 +353,14 @@ export default function TechnicalProfileSetup() {
                                   <label
                                     key={item}
                                     onClick={() => toggleSubSkill(domainId, item)}
-                                    className={`p-2 rounded border text-xs flex items-center justify-between cursor-pointer transition-colors ${
+                                    className={`p-2 rounded-lg border text-xs flex items-center justify-between cursor-pointer transition-colors ${
                                       isChecked
-                                        ? 'bg-cyber-primary/15 border-cyber-primary text-white'
-                                        : 'bg-[#080C14] border-cyber-border/70 text-cyber-muted hover:text-white'
+                                        ? 'bg-sky-50 border-sky-300 text-slate-900 font-semibold'
+                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                                     }`}
                                   >
                                     <span className="truncate pr-2">{item}</span>
-                                    <div className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] font-bold shrink-0 ${isChecked ? 'bg-cyber-primary text-black border-cyber-primary' : 'border-cyber-border'}`}>
+                                    <div className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] font-bold shrink-0 ${isChecked ? 'bg-sky-600 text-white border-sky-600' : 'border-slate-300'}`}>
                                       {isChecked && '✓'}
                                     </div>
                                   </label>
@@ -369,7 +374,7 @@ export default function TechnicalProfileSetup() {
 
                     {domainId === 'OTHER' && (
                       <div className="pt-2">
-                        <label className="text-xs font-bold text-cyber-muted uppercase block mb-1.5">
+                        <label className="text-xs font-bold text-slate-700 uppercase block mb-1.5">
                           Specify Other Technical Skills or Frameworks:
                         </label>
                         <input
@@ -377,7 +382,7 @@ export default function TechnicalProfileSetup() {
                           value={otherSkillText}
                           onChange={(e) => setOtherSkillText(e.target.value)}
                           placeholder="e.g. Flutter, Rust, Embedded C, Unreal Engine..."
-                          className="w-full p-2.5 bg-[#080C14] border border-cyber-border rounded text-xs text-white placeholder-cyber-muted/50 focus:outline-none focus:border-cyber-primary font-mono"
+                          className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-500 font-mono"
                         />
                       </div>
                     )}
@@ -389,14 +394,14 @@ export default function TechnicalProfileSetup() {
           })}
         </div>
 
-        {/* Step 4: Preferred Programming Language (if applicable) */}
+        {/* Step 4: Preferred Programming Language */}
         {requiresLanguageSelect && (
-          <div className="cyber-panel p-5 border border-cyber-border rounded-lg space-y-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-cyber-primary text-black flex items-center justify-center text-xs font-bold">3</span>
+          <div className="bg-white p-5 border border-slate-200 rounded-xl space-y-3 shadow-xs">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold">3</span>
               PRIMARY PROGRAMMING LANGUAGE FOR PRACTICAL TASKS
             </h2>
-            <p className="text-xs text-cyber-muted">
+            <p className="text-xs text-slate-500">
               Select the primary language you prefer to write and debug code in:
             </p>
             <div className="flex flex-wrap gap-2.5">
@@ -407,10 +412,10 @@ export default function TechnicalProfileSetup() {
                     key={lang}
                     type="button"
                     onClick={() => setPreferredLanguage(lang)}
-                    className={`px-5 py-2.5 text-xs font-bold rounded border transition-all ${
+                    className={`px-5 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
                       isLangActive
-                        ? 'bg-cyber-primary text-black border-cyber-primary shadow-[0_0_15px_rgba(0,255,204,0.3)]'
-                        : 'bg-[#0B1018] border-cyber-border text-cyber-muted hover:text-white hover:border-cyber-primary/40'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                     }`}
                   >
                     {lang}
@@ -421,28 +426,28 @@ export default function TechnicalProfileSetup() {
           </div>
         )}
 
-        {/* Step 3: Launch Assessment Sticky Footer Bar */}
-        <div className="cyber-panel p-6 border-2 border-cyber-primary/60 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4 bg-[#080C14] shadow-[0_0_30px_rgba(0,255,204,0.15)] sticky bottom-4 z-20">
+        {/* Launch Assessment Sticky Footer Bar */}
+        <div className="bg-white p-6 border-2 border-slate-200 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl sticky bottom-4 z-20">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/40 rounded">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-full font-mono">
                 STEP 3: READY TO LAUNCH
               </span>
-              <span className="text-[10px] text-cyber-muted">
+              <span className="text-[10px] text-slate-500">
                 Mandatory Fullscreen Mode
               </span>
             </div>
-            <h3 className="text-base font-bold text-white mt-1">START YOUR 25-MIN TECHNICAL TEST</h3>
-            <p className="text-xs text-cyber-muted mt-0.5">
+            <h3 className="text-base font-bold text-slate-900 mt-1">START YOUR 25-MIN TECHNICAL TEST</h3>
+            <p className="text-xs text-slate-500 mt-0.5">
               {selectedDomains.length} domains selected • {Object.values(selectedSubSkills).flat().length} sub-skills covered • Calibrated multi-tier challenges
             </p>
           </div>
 
           <button
             onClick={handleStartRound2}
-            className="w-full md:w-auto px-8 py-4 bg-cyber-primary hover:bg-white text-black font-extrabold text-xs uppercase tracking-wider rounded transition-all shadow-[0_0_25px_rgba(0,255,204,0.4)] flex items-center justify-center gap-2.5 cursor-pointer transform active:scale-95"
+            className="w-full md:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer transform active:scale-95"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 className="w-4 h-4 text-sky-400" />
             <span>ENTER FULLSCREEN & START TEST &rarr;</span>
           </button>
         </div>

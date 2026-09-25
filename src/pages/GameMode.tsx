@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
 import { useStore } from '../store/useStore';
 import { useNavigate } from 'react-router-dom';
-import CyberRoom from '../game/environment/CyberRoom';
-import Player from '../game/player/Player';
 import ChallengeModal from '../challenges/components/ChallengeModal';
 import { missions } from '../data/missions';
 import { challenges } from '../data/challenges';
@@ -15,15 +12,14 @@ import {
   Maximize2,
   Trophy,
   Sparkles,
-  Shield,
-  VideoOff
+  VideoOff,
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 import { isBrowserFullscreen, FULLSCREEN_EVENTS } from '../utils/fullscreen';
-import { useDeviceDetection } from '../hooks/useDeviceDetection';
 
 export default function GameMode() {
   const navigate = useNavigate();
-  const { isMobile, isTouch } = useDeviceDetection();
 
   const { 
     mode, 
@@ -42,45 +38,28 @@ export default function GameMode() {
     setRound1Submitted
   } = useStore();
 
-  const [isDirectMode, setIsDirectMode] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    }
-    return false;
-  });
-
-  const [inRangeOfTerminal, setInRangeOfTerminal] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
   const [showLevelUpAlert, setShowLevelUpAlert] = useState<string | null>(null);
   const [showRound1CompleteModal, setShowRound1CompleteModal] = useState<boolean>(false);
   const [challengeIndexInMission, setChallengeIndexInMission] = useState(0);
   const [logs, setLogs] = useState<string[]>([
     'CYBER CELL RECRUITMENT ASSESSMENT ENGINE ONLINE',
     '30 MCQS LOADED ACROSS 8 TECHNICAL DOMAIN LEVELS',
-    'CONTROLS: W/A/S/D TO WALK • MOUSE TO LOOK • [E] TO INTERACT',
     'PRESS A/B/C/D TO CHOOSE • PRESS ENTER TO SUBMIT & PROCEED'
   ]);
 
-  // Enforce Direct Assessment Mode on mobile / touch screen devices
-  useEffect(() => {
-    if (isMobile || isTouch) {
-      setIsDirectMode(true);
-    }
-  }, [isMobile, isTouch]);
-
   const currentMission = missions[currentMissionIndex] || missions[0];
 
-  // Auto-open next active question in Direct Assessment Mode
+  // Auto-open next active question in direct focused assessment mode
   useEffect(() => {
-    if (isDirectMode && !activeChallenge && !showRound1CompleteModal && !warningNotice) {
+    if (!activeChallenge && !showRound1CompleteModal && !warningNotice) {
       const currentChallengeId = currentMission.challengeIds[challengeIndexInMission] || currentMission.challengeIds[0];
       const chal = challenges.find(c => c.id === currentChallengeId) || challenges[0];
       const timer = setTimeout(() => {
         setActiveChallenge(chal);
-      }, 200);
+      }, 150);
       return () => clearTimeout(timer);
     }
-  }, [isDirectMode, activeChallenge, currentMission, challengeIndexInMission, showRound1CompleteModal, warningNotice, setActiveChallenge]);
+  }, [activeChallenge, currentMission, challengeIndexInMission, showRound1CompleteModal, warningNotice, setActiveChallenge]);
 
   const proctorVideoRef = useRef<HTMLVideoElement>(null);
   const [cameraActive, setCameraActive] = useState<boolean>(false);
@@ -247,29 +226,10 @@ export default function GameMode() {
     }
   }, [timeRemainingSeconds, navigate, setRound1Submitted]);
 
-  // Pointer lock change listener
-  useEffect(() => {
-    const handleLockChange = () => {
-      setIsLocked(document.pointerLockElement !== null);
-    };
-    document.addEventListener('pointerlockchange', handleLockChange);
-    return () => document.removeEventListener('pointerlockchange', handleLockChange);
-  }, []);
-
   const formatTimer = (totalSeconds: number) => {
     const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
     const s = (totalSeconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
-  };
-
-  const handleOpenTerminal = () => {
-    if (document.exitPointerLock) {
-      document.exitPointerLock();
-    }
-    const currentChallengeId = currentMission.challengeIds[challengeIndexInMission] || currentMission.challengeIds[0];
-    const chal = challenges.find(c => c.id === currentChallengeId) || challenges[0];
-    setActiveChallenge(chal);
-    setLogs(prev => [`> OPENED: ${chal.title}`, ...prev.slice(0, 6)]);
   };
 
   const handleNextChallenge = () => {
@@ -319,111 +279,60 @@ export default function GameMode() {
   };
 
   return (
-    <div className="relative w-screen h-screen bg-[#05070D] overflow-hidden select-none font-mono-cyber">
+    <div className="relative w-screen h-screen bg-slate-50 text-slate-900 overflow-hidden select-none font-sans">
       
-      {/* Background: 3D Cyber Room in 3D mode OR Minimalist Cyber Grid in Direct mode */}
-      {!isDirectMode ? (
-        <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 1.6, 3], fov: 65 }}>
-            <CyberRoom 
-              onInteractTerminal={handleOpenTerminal} 
-              missionTitle={currentMission.title}
-            />
-            <Player 
-              onInteract={handleOpenTerminal} 
-              canInteract={inRangeOfTerminal} 
-              onProximityChange={setInRangeOfTerminal}
-              isChallengeOpen={!!activeChallenge}
-            />
-          </Canvas>
-        </div>
-      ) : (
-        <div className="absolute inset-0 z-0 bg-[#05070D] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-950/20 via-[#05070D] to-[#030408]">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
-        </div>
-      )}
+      {/* Light Clean Subtle Architectural Grid */}
+      <div className="absolute inset-0 z-0 bg-slate-50 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-40" />
 
-      {/* Level Up Celebration Toast Notification */}
+      {/* Level Up Celebration Toast */}
       {showLevelUpAlert && (
-        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 bg-[#0D1322] border border-white/[0.12] p-3 sm:p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fadeIn font-sans max-w-[90vw]">
-          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 shrink-0" />
+        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 bg-white border border-slate-200 p-3 sm:p-4 rounded-xl shadow-xl flex items-center gap-3 animate-fadeIn max-w-[90vw]">
+          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 shrink-0" />
           <div>
-            <div className="text-[10px] sm:text-xs uppercase text-sky-400 font-semibold tracking-wider flex items-center gap-1.5">
+            <div className="text-[10px] sm:text-xs uppercase text-sky-600 font-semibold tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               LEVEL COMPLETED
             </div>
-            <div className="text-xs sm:text-sm font-semibold text-white mt-0.5">
+            <div className="text-xs sm:text-sm font-semibold text-slate-900 mt-0.5">
               {showLevelUpAlert}
             </div>
           </div>
         </div>
       )}
 
-      {/* Pointer Lock Overlay (Only in 3D Mode) */}
-      {!isDirectMode && !isLocked && !activeChallenge && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 backdrop-blur-sm pointer-events-auto font-sans p-4">
-          <div className="text-center p-6 bg-[#0D1322] border border-white/[0.1] shadow-2xl max-w-md rounded-xl animate-scaleIn">
-            <Shield className="w-10 h-10 text-sky-400 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white tracking-wide uppercase">CLICK TO CONTROL AGENT</h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Click anywhere to steer your agent. Walk over to the central console and press <span className="text-white font-semibold">[E]</span> to open the case investigation file.
-            </p>
-            <div className="mt-4 px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.08] text-slate-300 text-xs font-medium rounded-lg inline-block font-mono">
-              {mode === 'demo' ? 'DEMO MODE (PRACTICE)' : 'RECRUITMENT MODE ACTIVE'}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Proximity Aim Target / Interaction Prompt (Only in 3D Mode) */}
-      {!isDirectMode && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 font-sans">
-          {inRangeOfTerminal ? (
-            <div className="flex flex-col items-center gap-1.5 animate-scaleIn">
-              <span className="text-xs font-semibold text-slate-950 bg-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-sky-500" />
-                Press [E] or Click to Open Terminal
-              </span>
-            </div>
-          ) : (
-            <div className="w-1.5 h-1.5 bg-white/70 rounded-full ring-4 ring-white/10" />
-          )}
-        </div>
-      )}
-
-      {/* Sleek Unified Top Navigation Bar */}
-      <header className="fixed top-0 inset-x-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 bg-[#080C14]/90 backdrop-blur-md border-b border-white/[0.08] flex items-center justify-between font-sans pointer-events-auto shadow-sm">
+      {/* Professional Light Header */}
+      <header className="fixed top-0 inset-x-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center justify-between pointer-events-auto shadow-xs">
         
         {/* Left: Organization Identity */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0F172A] border border-white/[0.1] flex items-center justify-center font-mono text-xs font-bold text-sky-400">
+          <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center font-mono text-xs font-bold text-sky-700">
             CC
           </div>
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-xs font-bold tracking-tight text-white uppercase">
+              <span className="text-xs font-bold tracking-tight text-slate-900 uppercase">
                 CYBER CELL
               </span>
-              <span className="text-[9px] sm:text-[10px] text-sky-400 font-mono px-1 sm:px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
-                SOC
+              <span className="text-[9px] sm:text-[10px] text-sky-700 font-mono px-1.5 py-0.5 rounded bg-sky-50 border border-sky-200 font-medium">
+                SOC SCREENING
               </span>
             </div>
-            <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono">Stage 01 A • Screening</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono">Stage 01 A • Technical Assessment</p>
           </div>
         </div>
 
         {/* Center: Clean Level Progression & Question Counter */}
         <div className="flex flex-col items-center gap-1 min-w-0 px-1">
           <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs">
-            <span className="font-semibold text-white">
-              L{currentMissionIndex + 1}/{missions.length}
+            <span className="font-semibold text-slate-900">
+              Level {currentMissionIndex + 1} of {missions.length}
             </span>
-            <span className="text-slate-500">•</span>
-            <span className="text-slate-300 font-medium truncate max-w-[90px] xs:max-w-[140px] sm:max-w-none">
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-600 font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-none">
               {currentMission.title.split(':')[1]?.trim() || currentMission.title}
             </span>
-            <span className="text-slate-500 hidden sm:inline">•</span>
-            <span className="text-sky-400 font-mono text-[10px] hidden sm:inline">
+            <span className="text-slate-300 hidden sm:inline">•</span>
+            <span className="text-sky-600 font-mono text-[10px] hidden sm:inline font-semibold">
               Q{challengeIndexInMission + 1}/{currentMission.challengeIds.length}
             </span>
           </div>
@@ -436,12 +345,12 @@ export default function GameMode() {
                 <div
                   key={m.id}
                   title={`Level ${idx + 1}: ${m.title}`}
-                  className={`h-1 sm:h-1.5 rounded-full transition-all ${
+                  className={`h-1.5 rounded-full transition-all ${
                     isCurrent
-                      ? 'w-4 sm:w-8 bg-sky-400 ring-2 ring-sky-400/30'
+                      ? 'w-6 sm:w-8 bg-sky-600 ring-2 ring-sky-100'
                       : isCompleted
-                      ? 'w-3 sm:w-6 bg-emerald-400'
-                      : 'w-2 sm:w-5 bg-white/10'
+                      ? 'w-3 sm:w-6 bg-emerald-500'
+                      : 'w-2 sm:w-5 bg-slate-200'
                   }`}
                 />
               );
@@ -449,69 +358,76 @@ export default function GameMode() {
           </div>
         </div>
 
-        {/* Right: Timer, Score, Mode Toggle & End Action */}
+        {/* Right: Timer, Score & End Action */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Desktop Mode Switcher */}
-          {!isMobile && (
-            <button
-              onClick={() => {
-                if (isDirectMode) {
-                  setActiveChallenge(null);
-                  setIsDirectMode(false);
-                } else {
-                  setIsDirectMode(true);
-                }
-              }}
-              className="hidden lg:flex items-center gap-1 px-2.5 py-1 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs text-slate-300 rounded-lg transition-colors cursor-pointer"
-              title="Toggle between 3D Immersion and Direct Assessment view"
-            >
-              <span className="text-xs">{isDirectMode ? '🎮' : '📝'}</span>
-              <span className="font-mono text-[10px]">{isDirectMode ? '3D View' : 'Direct View'}</span>
-            </button>
-          )}
-
-          <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-lg">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
-            <span className={`font-mono font-semibold ${timeRemainingSeconds < 300 ? 'text-red-400 animate-pulse' : 'text-slate-200'}`}>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 border border-slate-200 text-xs rounded-lg">
+            <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <span className={`font-mono font-semibold ${timeRemainingSeconds < 300 ? 'text-red-600 animate-pulse' : 'text-slate-700'}`}>
               {formatTimer(timeRemainingSeconds)}
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-lg">
-            <span className="text-[10px] uppercase font-mono text-slate-400">Score</span>
-            <span className="font-bold text-white font-mono">{score}</span>
+          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-slate-100 border border-slate-200 text-xs rounded-lg">
+            <span className="text-[10px] uppercase font-mono text-slate-500 font-semibold">Score</span>
+            <span className="font-bold text-slate-900 font-mono">{score}</span>
           </div>
 
           <button
             onClick={() => {
-              if (window.confirm('Are you sure you want to finish Round 01 A and view your scorecard?')) {
+              if (window.confirm('Are you sure you want to finish Round 01 A and submit your test?')) {
                 navigate('/result');
               }
             }}
-            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 text-xs font-medium transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold transition-colors cursor-pointer"
           >
-            End
+            Submit & End
           </button>
         </div>
 
       </header>
 
-      {/* Live Proctoring Webcam Corner Card */}
-      <div className={`fixed z-30 bg-[#0D1322]/90 backdrop-blur-md border border-white/[0.1] rounded-xl p-2 shadow-xl flex flex-col gap-1.5 pointer-events-auto font-sans transition-all ${
-        isDirectMode 
-          ? 'bottom-3 right-3 sm:bottom-5 sm:right-5 w-28 sm:w-36' 
-          : 'top-16 sm:top-18 right-3 sm:right-5 w-36 sm:w-44'
-      }`}>
+      {/* Main Focus Area (When question modal is preparing or transitioning) */}
+      <main className="absolute inset-0 flex flex-col items-center justify-center p-4 pt-16 z-10">
+        {!activeChallenge && !showRound1CompleteModal && (
+          <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">
+              Level {currentMissionIndex + 1}: {currentMission.title}
+            </h3>
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              {currentMission.terminalHint || 'Prepare for next technical problem.'}
+            </p>
+            <div className="mt-5">
+              <button
+                onClick={() => {
+                  const currentChallengeId = currentMission.challengeIds[challengeIndexInMission] || currentMission.challengeIds[0];
+                  const chal = challenges.find(c => c.id === currentChallengeId) || challenges[0];
+                  setActiveChallenge(chal);
+                }}
+                className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Open Question {challengeIndexInMission + 1}</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Live Proctoring Webcam Picture-In-Picture */}
+      <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-30 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl p-2 shadow-md flex flex-col gap-1.5 pointer-events-auto font-sans w-28 sm:w-36">
         <div className="flex items-center justify-between text-[10px]">
           <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-semibold text-white">Proctor</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-slate-800">Proctor</span>
           </div>
-          <span className="text-[9px] text-slate-400 font-mono uppercase">
+          <span className="text-[9px] text-slate-500 font-mono uppercase">
             {cameraActive ? 'Active' : 'Offline'}
           </span>
         </div>
-        <div className="w-full h-18 sm:h-24 bg-black rounded-lg border border-white/[0.08] overflow-hidden relative flex items-center justify-center">
+        <div className="w-full h-18 sm:h-24 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
           <video
             ref={proctorVideoRef}
             autoPlay
@@ -521,38 +437,23 @@ export default function GameMode() {
           />
           {!cameraActive && (
             <div className="flex flex-col items-center justify-center gap-1 text-slate-400 p-1 text-center">
-              <VideoOff className="w-4 h-4 text-red-400" />
+              <VideoOff className="w-4 h-4 text-red-500" />
               <span className="text-[9px]">Camera...</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Telemetry & Case Briefing Card (Desktop 3D mode only) */}
-      {!isDirectMode && (
-        <div className="hidden lg:block fixed bottom-5 left-5 z-20 w-80 sm:w-96 p-4 bg-[#0D1322]/90 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-2xl pointer-events-auto font-sans">
-          <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-2.5">
-            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 font-mono">
-              <Activity className="w-3.5 h-3.5 text-sky-400" />
-              Case Telemetry
-            </span>
-            <span className="text-[10px] text-emerald-400 font-mono font-medium">LIVE STREAM</span>
-          </div>
-          
-          <div className="space-y-1 text-xs h-20 overflow-y-auto leading-relaxed font-mono">
-            {logs.map((log, idx) => (
-              <p key={idx} className={idx === 0 ? 'text-sky-300 font-medium' : 'text-slate-400'}>
-                {log}
-              </p>
-            ))}
-          </div>
-
-          <div className="mt-2.5 pt-2.5 border-t border-white/[0.06] text-xs text-amber-300/90 leading-snug flex items-start gap-1.5">
-            <span className="shrink-0">💡</span>
-            <span><strong>Case Objective:</strong> {currentMission.terminalHint}</span>
-          </div>
+      {/* Bottom Telemetry Bar (Desktop) */}
+      <div className="hidden lg:flex fixed bottom-5 left-5 z-20 w-80 p-3 bg-white/90 border border-slate-200 backdrop-blur-md rounded-xl shadow-xs pointer-events-auto items-center justify-between text-xs">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-sky-600" />
+          <span className="text-[11px] font-medium text-slate-700 font-mono">
+            {logs[0] || 'System Active'}
+          </span>
         </div>
-      )}
+        <span className="text-[10px] text-emerald-600 font-mono font-semibold">LIVE</span>
+      </div>
 
       {/* Active Case Challenge Modal */}
       {activeChallenge && (
@@ -565,54 +466,54 @@ export default function GameMode() {
 
       {/* Round 1 Completion Transition Modal */}
       {showRound1CompleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
-          <div className="w-full max-w-lg bg-[#0D1322] p-8 border border-white/[0.1] text-center shadow-2xl rounded-2xl animate-scaleIn">
-            <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mx-auto mb-4">
-              <Trophy className="w-7 h-7 text-sky-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-white p-8 border border-slate-200 text-center shadow-xl rounded-2xl animate-scaleIn">
+            <div className="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-7 h-7 text-sky-600" />
             </div>
 
-            <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-md inline-block mb-2">
+            <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 bg-sky-50 border border-sky-200 text-sky-700 rounded-md inline-block mb-2">
               SOC OPERATIONS COMPLETE
             </span>
 
-            <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight">
-              Round 01 A Debrief Complete
+            <h3 className="text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-tight">
+              Round 01 A Assessment Complete
             </h3>
 
-            <p className="text-xs text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
               All 30 SOC screening questions and scenarios resolved. Your tactical performance baseline has been captured.
             </p>
 
-            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded-xl bg-[#090D18] border border-white/[0.06] text-left">
+            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-left">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase block font-mono">Score Earned</span>
-                <span className="text-xl font-bold text-white font-mono">{score} PTS</span>
+                <span className="text-[10px] text-slate-500 uppercase block font-mono">Score Earned</span>
+                <span className="text-xl font-bold text-slate-900 font-mono">{score} PTS</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 uppercase block font-mono">XP Progression</span>
-                <span className="text-xl font-bold text-indigo-400 font-mono">{xp} XP</span>
+                <span className="text-[10px] text-slate-500 uppercase block font-mono">XP Progression</span>
+                <span className="text-xl font-bold text-indigo-600 font-mono">{xp} XP</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate('/technical-profile')}
-                className="w-full py-3.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-sky-600" />
+                <Sparkles className="w-4 h-4 text-sky-400" />
                 <span>ENTER ROUND 01 B: SKILL PROFILING &rarr;</span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => navigate('/result')}
-                  className="py-2.5 px-3 bg-white/[0.05] hover:bg-white/[0.1] text-slate-200 border border-white/[0.08] font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
                   View Scorecard
                 </button>
                 <button
                   onClick={() => navigate('/arcade')}
-                  className="py-2.5 px-3 bg-white/[0.05] hover:bg-white/[0.1] text-amber-400 border border-amber-400/20 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
                   Bonus Labs
                 </button>
@@ -624,21 +525,21 @@ export default function GameMode() {
 
       {/* Anti-Cheat Warning Modal */}
       {warningNotice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
-          <div className="w-full max-w-lg bg-[#0D1322] p-6 border border-red-500/40 text-center shadow-2xl rounded-2xl animate-scaleIn">
-            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-white p-6 border border-red-200 text-center shadow-xl rounded-2xl animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wider">
               Integrity Violation Recorded
             </h3>
-            <div className="mt-4 p-4 bg-[#080C14] border border-red-500/20 rounded-xl text-left text-xs text-slate-200 whitespace-pre-line leading-relaxed">
+            <div className="mt-4 p-4 bg-red-50/60 border border-red-200 rounded-xl text-left text-xs text-slate-700 whitespace-pre-line leading-relaxed font-mono">
               {warningNotice.message}
             </div>
             <div className="mt-6 flex flex-col gap-2.5">
               <button
                 onClick={restoreFullscreen}
-                className="w-full py-3 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm cursor-pointer"
+                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm cursor-pointer"
               >
                 <Maximize2 className="w-4 h-4" />
                 RESTORE FULLSCREEN & CONTINUE

@@ -23,43 +23,35 @@ export default function FillInBlankModal({
   const template = challenge.fillInBlank?.displayTemplate;
 
   // Split target word into words and characters for slot rendering
-  // e.g. "GROUP BY" -> [["G","R","O","U","P"], ["B","Y"]]
   const targetChunks = targetWord.split(/\s+/).map((w: string) => w.split(''));
   const totalLetters = targetChunks.flat().length;
 
-  // Linear array of user letters (only for alphabetic/numeric slots)
   const [letters, setLetters] = useState<string[]>(() => Array(totalLetters).fill(''));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  // References to the slot input elements
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Focus the first empty slot on initial mount
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
   }, [challenge.id]);
 
-  // Handle single character input in slot
   const handleSlotChange = (index: number, value: string) => {
-    const val = value.slice(-1).toUpperCase(); // Take the last typed character
+    const val = value.slice(-1).toUpperCase();
     const updated = [...letters];
     updated[index] = val;
     setLetters(updated);
 
-    // Auto-advance to next slot if a letter was entered
     if (val && index < totalLetters - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  // Handle backspace and navigation keys
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace') {
       if (!letters[index] && index > 0) {
-        // Current slot is already empty, move to previous slot and clear it
         e.preventDefault();
         const updated = [...letters];
         updated[index - 1] = '';
@@ -82,7 +74,6 @@ export default function FillInBlankModal({
     }
   };
 
-  // Handle paste into slots
   const handlePaste = (startIndex: number, e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const pastedText = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -97,16 +88,15 @@ export default function FillInBlankModal({
     inputRefs.current[nextIdx]?.focus();
   };
 
-  // Synchronize full typed string
-  const assembleAnswer = () => {
+  const getAssembledAnswer = () => {
     let letterPtr = 0;
-    return targetChunks.map((chunk: string[]) => {
-      const word = chunk.map(() => letters[letterPtr++] || '').join('');
-      return word;
-    }).join(' ').trim();
+    return targetChunks
+      .map((chunk: string[]) => {
+        const word = chunk.map(() => letters[letterPtr++] || '_').join('');
+        return word;
+      })
+      .join(' ');
   };
-
-  const currentAnswer = assembleAnswer();
 
   const handleClear = () => {
     setLetters(Array(totalLetters).fill(''));
@@ -115,18 +105,27 @@ export default function FillInBlankModal({
 
   const handleSubmit = () => {
     if (isSubmitting) return;
-
-    const userAnsClean = currentAnswer.replace(/\s+/g, ' ').toUpperCase();
-    if (!userAnsClean) return;
-
     setIsSubmitting(true);
 
-    const norm = (s: string) => s.replace(/[^A-Z0-9]/gi, '').toUpperCase();
-    const targetNorm = norm(targetWord);
-    const userNorm = norm(userAnsClean);
+    const userAnsClean = getAssembledAnswer().replace(/_/g, '').trim().toUpperCase();
+    const isMatch = acceptedAnswers.some(
+      ans => ans.trim().toUpperCase() === userAnsClean || ans.replace(/\s+/g, '').toUpperCase() === userAnsClean.replace(/\s+/g, '')
+    );
 
-    const isMatch = userNorm === targetNorm || acceptedAnswers.some((ans: string) => norm(ans) === userNorm);
-    const scoreAwarded = isMatch ? challenge.points : 0;
+    let scoreAwarded = 0;
+    if (isMatch) {
+      scoreAwarded = challenge.points;
+    } else {
+      let matchedLetters = 0;
+      const targetClean = targetWord.replace(/\s+/g, '').toUpperCase();
+      const userClean = userAnsClean.replace(/\s+/g, '').toUpperCase();
+      for (let i = 0; i < Math.min(targetClean.length, userClean.length); i++) {
+        if (targetClean[i] === userClean[i]) matchedLetters++;
+      }
+      if (matchedLetters >= targetClean.length * 0.75) {
+        scoreAwarded = Math.round(challenge.points * 0.5);
+      }
+    }
 
     onSubmit(scoreAwarded, userAnsClean, isMatch);
   };
@@ -134,34 +133,34 @@ export default function FillInBlankModal({
   let globalSlotIndex = 0;
 
   return (
-    <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[85vh] shadow-2xl rounded-xl animate-scaleIn font-sans overflow-hidden my-auto">
+    <div className="w-full max-w-3xl bg-white border border-slate-200 flex flex-col max-h-[85vh] shadow-xl rounded-2xl animate-scaleIn font-sans overflow-hidden my-auto">
       
       {/* Header - Fixed */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] px-4 sm:px-6 py-3 sm:py-4 bg-[#090D18] shrink-0">
+      <div className="flex items-center justify-between border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg shrink-0">
-            <Code2 className="w-5 h-5 text-sky-400" />
+          <div className="p-2 bg-sky-50 border border-sky-200 text-sky-700 rounded-lg shrink-0">
+            <Code2 className="w-5 h-5 text-sky-600" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-50 text-sky-700 border border-sky-200 rounded">
                 TIER 3 • FILL IN THE BLANK
               </span>
-              <span className="text-[10px] text-slate-400 uppercase">
+              <span className="text-[10px] text-slate-500 uppercase">
                 {challenge.domain} • {challenge.subSkill}
               </span>
             </div>
-            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-1">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight mt-1">
               {challenge.title}
             </h2>
           </div>
         </div>
 
         <div className="text-right shrink-0">
-          <span className="text-xs px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md">
+          <span className="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold rounded-md">
             +{challenge.points} PTS
           </span>
-          <span className="text-[10px] text-slate-400 block mt-1">
+          <span className="text-[10px] text-slate-500 block mt-1 font-mono">
             {totalLetters} LETTERS TOTAL
           </span>
         </div>
@@ -170,13 +169,13 @@ export default function FillInBlankModal({
       {/* Scrollable Challenge Content */}
       <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
         {/* Challenge Prompt */}
-        <div className="p-4 bg-[#070A12] border border-white/[0.06] rounded-lg leading-relaxed text-sm text-slate-200">
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed text-sm text-slate-800">
           <p className="whitespace-pre-wrap">{challenge.prompt}</p>
           
           {/* Optional Code Snippet with template */}
           {challenge.codeSnippet && (
-            <div className="mt-3 p-3 bg-black/60 border border-white/10 rounded-lg font-mono text-xs text-sky-300 overflow-x-auto">
-              <span className="text-[9px] uppercase text-slate-400 block mb-1">
+            <div className="mt-3 p-3 bg-white border border-slate-200 rounded-lg font-mono text-xs text-sky-800 overflow-x-auto">
+              <span className="text-[9px] uppercase text-slate-500 block mb-1 font-semibold">
                 Code Context ({challenge.codeSnippet.language}):
               </span>
               <pre className="whitespace-pre-wrap">{challenge.codeSnippet.code}</pre>
@@ -184,24 +183,24 @@ export default function FillInBlankModal({
           )}
 
           {template && (
-            <div className="mt-3 p-3 bg-black/40 border border-white/10 rounded-lg font-mono text-xs text-white">
-              <span className="text-[9px] uppercase text-slate-400 block mb-1">Fill the blank:</span>
-              <span className="text-sky-300 font-bold text-sm tracking-wider">{template}</span>
+            <div className="mt-3 p-3 bg-white border border-slate-200 rounded-lg font-mono text-xs text-slate-900">
+              <span className="text-[9px] uppercase text-slate-500 block mb-1 font-semibold">Fill the blank:</span>
+              <span className="text-sky-700 font-bold text-sm tracking-wider">{template}</span>
             </div>
           )}
         </div>
 
         {/* Interactive Letter Slots Interface */}
-        <div className="p-4 sm:p-5 bg-[#090D18] border border-white/[0.08] rounded-xl space-y-4">
+        <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 flex items-center gap-1.5 font-mono">
+              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
               ENTER LETTERS IN THE SLOTS ({totalLetters} LETTERS):
             </span>
             <button
               type="button"
               onClick={handleClear}
-              className="text-[11px] text-slate-400 hover:text-white flex items-center gap-1 transition-colors cursor-pointer"
+              className="text-[11px] text-slate-500 hover:text-slate-900 flex items-center gap-1 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Clear Slots
@@ -226,14 +225,14 @@ export default function FillInBlankModal({
                         onChange={(e) => handleSlotChange(currentSlot, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(currentSlot, e)}
                         onPaste={(e) => handlePaste(currentSlot, e)}
-                        className={`w-7.5 h-9.5 xs:w-8 xs:h-10 sm:w-11 sm:h-12 text-center text-base sm:text-xl font-bold uppercase rounded-lg border transition-all outline-none font-mono ${
+                        className={`w-8 h-10 sm:w-11 sm:h-12 text-center text-base sm:text-xl font-bold uppercase rounded-lg border transition-all outline-none font-mono ${
                           isFilled
-                            ? 'bg-sky-500/15 border-sky-400 text-white'
-                            : 'bg-black/40 border-white/20 text-slate-300 hover:border-white/40 focus:border-sky-400 focus:bg-sky-500/10'
+                            ? 'bg-sky-50 border-sky-500 text-slate-900 shadow-xs'
+                            : 'bg-white border-slate-300 text-slate-700 hover:border-slate-400 focus:border-sky-500 focus:bg-sky-50/50'
                         }`}
                         placeholder="_"
                       />
-                      <span className="text-[8px] sm:text-[9px] text-slate-500">
+                      <span className="text-[8px] sm:text-[9px] text-slate-400 font-mono">
                         {charIdx + 1}
                       </span>
                     </div>
@@ -244,54 +243,47 @@ export default function FillInBlankModal({
           </div>
 
           {/* Live Answer Assembled Preview */}
-          <div className="p-3 bg-black/40 border border-white/10 rounded-lg flex items-center justify-between text-xs">
+          <div className="p-3 bg-white border border-slate-200 rounded-lg flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400 text-[11px] uppercase">Your Assembled Answer:</span>
-              <span className="text-white font-bold font-mono tracking-widest text-sm">
-                {currentAnswer || <span className="text-slate-500 italic">_ _ _ _</span>}
+              <span className="text-slate-500 text-[11px] uppercase font-mono">Your Assembled Answer:</span>
+              <span className="text-slate-900 font-bold font-mono tracking-widest text-sm">
+                {getAssembledAnswer()}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 hidden sm:inline">
-              Press <kbd className="px-1 py-0.5 bg-black border border-white/20 text-white rounded">↵ ENTER</kbd> to submit
-            </span>
+            
+            {challenge.fillInBlank?.hint && (
+              <button
+                type="button"
+                onClick={() => setShowHint(!showHint)}
+                className="text-[11px] text-amber-700 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+              >
+                <HelpCircle className="w-3 h-3" />
+                {showHint ? 'Hide Hint' : 'Show Hint'}
+              </button>
+            )}
           </div>
 
-          {/* Hint Disclosure */}
-          {challenge.fillInBlank?.hint && (
-            <div className="pt-1">
-              {!showHint ? (
-                <button
-                  type="button"
-                  onClick={() => setShowHint(true)}
-                  className="text-[11px] text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  Need a clue? Click here to reveal technical hint
-                </button>
-              ) : (
-                <div className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-lg text-xs text-amber-300 animate-fadeIn">
-                  💡 <strong className="text-white">Hint:</strong> {challenge.fillInBlank.hint}
-                </div>
-              )}
+          {showHint && challenge.fillInBlank?.hint && (
+            <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 animate-fadeIn">
+              💡 <strong>Hint:</strong> {challenge.fillInBlank.hint}
             </div>
           )}
         </div>
       </div>
 
-      {/* Fixed Footer & Submit Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
-        <div className="text-xs text-slate-400">
-          <span>Objective Evaluation • Exact letter & keyword match</span>
-        </div>
+      {/* Footer - Fixed */}
+      <div className="flex justify-between items-center px-6 py-4 border-t border-slate-200 bg-slate-50 shrink-0">
+        <span className="text-xs text-slate-500 hidden sm:inline font-mono">
+          Tip: Type directly or use Backspace to step backwards
+        </span>
 
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!currentAnswer.trim() || isSubmitting}
-          className="w-full sm:w-auto px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center justify-center gap-2"
         >
-          <Send className="w-4 h-4 text-slate-950" />
-          <span>SUBMIT ANSWER [ ↵ ]</span>
+          <span>SUBMIT SLOT ANSWER</span>
+          <Send className="w-3.5 h-3.5 text-white" />
         </button>
       </div>
 

@@ -16,11 +16,7 @@ import {
   Sparkles,
   Award,
   ChevronRight,
-  ExternalLink,
-  Maximize2,
-  EyeOff,
-  AlertTriangle,
-  ShieldAlert
+  AlertTriangle
 } from 'lucide-react';
 import InteractiveGameDispatcher from '../minigames/InteractiveGameDispatcher';
 import SkillUnlockTree from '../minigames/SkillUnlockTree';
@@ -95,196 +91,193 @@ const ARCADE_GAMES: ArcadeGameMeta[] = [
     category: 'Identity Security',
     difficulty: 'Beginner',
     points: 100,
-    description: 'Sort passwords into Weak/Medium/Strong buckets and assemble high-entropy characters to hit &ge;50 bits.',
+    description: 'Sort passwords into Weak/Medium/Strong buckets and assemble high-entropy characters to hit ≥50 bits.',
     icon: KeyRound,
   },
   {
     id: 'game-binary',
     type: 'binary-puzzle',
-    title: '8-Bit Binary Switch Matrix',
-    category: 'Networking & Hardware',
-    difficulty: 'Intermediate',
-    points: 150,
-    description: 'Toggle 8 hardware bit switches (128..1) to synthesize targeted decimal values and IP subnet metrics.',
+    title: 'Binary & Subnet Calculator',
+    category: 'Foundational Math',
+    difficulty: 'Beginner',
+    points: 100,
+    description: 'Flip individual binary bit gates to compute target decimals and evaluate basic subnet masks.',
     icon: Binary,
   },
   {
     id: 'game-cipher',
     type: 'cipher-wheel',
-    title: 'Caesar Cipher Ring',
-    category: 'Cryptography',
-    difficulty: 'Beginner',
-    points: 100,
-    description: 'Rotate the cryptographic Caesar substitution dial to decrypt intercepted threat transmissions.',
+    title: 'Caesar Cipher Wheel',
+    category: 'Applied Cryptography',
+    difficulty: 'Intermediate',
+    points: 150,
+    description: 'Rotate the cryptanalytic ring to decipher an intercepted SATI network ciphertext broadcast.',
     icon: Sliders,
   },
   {
     id: 'game-detective',
     type: 'digital-detective',
-    title: 'Digital Detective Kill-Chain',
-    category: 'Signature Forensics',
-    difficulty: 'Advanced',
-    points: 200,
-    description: 'Reconstruct a multi-stage corporate breach timeline from initial phishing payload to database exfiltration.',
+    title: 'Forensic Log Investigator',
+    category: 'Incident Response',
+    difficulty: 'Intermediate',
+    points: 150,
+    description: 'Correlate timestamps and web server access logs to uncover an automated credential stuffing attack.',
     icon: Search,
   },
   {
     id: 'game-terminal',
     type: 'cyber-terminal',
-    title: 'Cyber Terminal Forensics',
-    category: 'Linux SOC CLI',
+    title: 'Linux Incident Triage CLI',
+    category: 'Systems & Shell',
     difficulty: 'Advanced',
-    points: 250,
-    description: 'Investigate system auth logs using ls, cat, grep, and decode Base64 tokens inside a simulated Linux shell.',
+    points: 200,
+    description: 'Execute realistic Linux shell commands (grep, netstat, ps, kill, chmod) to neutralize an active server threat.',
     icon: Terminal,
-  },
+  }
 ];
 
 export default function CyberArcade() {
   const navigate = useNavigate();
-  const [selectedGameId, setSelectedGameId] = useState<string>('game-terminal');
+  const [selectedGameId, setSelectedGameId] = useState<string>('game-network');
+  const [completedGames, setCompletedGames] = useState<Record<string, number>>({});
+  const [activeMessage, setActiveMessage] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'games' | 'tree'>('games');
-  const [completedGames, setCompletedGames] = useState<Record<string, number>>(() => {
-    try {
-      const saved = localStorage.getItem('cyber_arcade_completed');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(isBrowserFullscreen());
-  const [showWarningModal, setShowWarningModal] = useState<boolean>(false);
+  
+  const [fullscreenReady, setFullscreenReady] = useState<boolean>(true);
+  const [warningMessage, setWarningMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initial verification after slight mount delay
-    const initialCheck = setTimeout(() => {
-      setIsFullscreen(isBrowserFullscreen());
-    }, 350);
+    try {
+      const saved = localStorage.getItem('arcade_completed');
+      if (saved) {
+        setCompletedGames(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
-    const handleFullscreenChange = () => {
-      const fs = isBrowserFullscreen();
-      setIsFullscreen(fs);
-      if (!fs) {
-        setShowWarningModal(true);
+  useEffect(() => {
+    const handleFullscreenState = () => {
+      const isFs = isBrowserFullscreen();
+      setFullscreenReady(isFs);
+      if (!isFs) {
+        setWarningMessage('FULLSCREEN EXITED: Simulation paused for examination integrity. Restore fullscreen to resume.');
+      } else {
+        setWarningMessage(null);
       }
     };
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setShowWarningModal(true);
-      }
-    };
-
-    FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenChange));
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenState));
+    setFullscreenReady(isBrowserFullscreen());
 
     return () => {
-      clearTimeout(initialCheck);
-      FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenChange));
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenState));
     };
   }, []);
 
+  const handleGameSolved = (gameId: string, points: number) => {
+    setCompletedGames(prev => {
+      const updated = { ...prev, [gameId]: points };
+      try {
+        localStorage.setItem('arcade_completed', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+
+    setActiveMessage(`Lab Simulation Mastered! +${points} Bonus Recruitment Points Awarded.`);
+    setTimeout(() => setActiveMessage(null), 4000);
+  };
+
   const handleRestoreFullscreen = async () => {
-    const success = await enterBrowserFullscreen();
-    if (success) {
-      setIsFullscreen(true);
-      setShowWarningModal(false);
+    try {
+      await enterBrowserFullscreen();
+      setWarningMessage(null);
+    } catch (e) {
+      console.warn(e);
     }
   };
 
-  const currentGame = ARCADE_GAMES.find(g => g.id === selectedGameId) || ARCADE_GAMES[0];
-
-  const handleGameSolved = (gameId: string, pts: number, isCorrect: boolean) => {
-    if (isCorrect) {
-      setCompletedGames(prev => {
-        const updated = {
-          ...prev,
-          [gameId]: pts
-        };
-        try {
-          localStorage.setItem('cyber_arcade_completed', JSON.stringify(updated));
-          const totalBonus = Object.values(updated).reduce((a, b) => a + b, 0);
-          localStorage.setItem('candidate_bonus_score', String(totalBonus));
-        } catch {
-          // ignore storage error
-        }
-        return updated;
-      });
-    }
-  };
-
+  const selectedGame = ARCADE_GAMES.find(g => g.id === selectedGameId) || ARCADE_GAMES[0];
   const totalScoreEarned = Object.values(completedGames).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-[#05070D] text-cyber-text font-mono-cyber flex flex-col">
-      {/* Top Navbar */}
-      <header className="border-b border-cyber-border bg-[#070B14]/90 backdrop-blur sticky top-0 z-50 px-4 md:px-8 py-3.5 flex items-center justify-between">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans select-none">
+      
+      {/* Top Header */}
+      <header className="bg-white border-b border-slate-200 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-30 shadow-xs">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/')}
-            className="p-2 rounded bg-white/5 hover:bg-white/10 text-cyber-muted hover:text-white transition-all border border-white/10"
-            title="Return to Base"
+            className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+            title="Return to Home"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
+          
+          <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold">
+            <Gamepad2 className="w-5 h-5 text-amber-600" />
+          </div>
+
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] tracking-widest text-amber-400 uppercase font-bold px-2 py-0.5 bg-amber-400/10 border border-amber-400/30 rounded">
-                STAGE 01 C • OPTIONAL BONUS
+              <h1 className="text-sm md:text-base font-bold text-slate-900 tracking-tight">
+                CYBER ARCADE • BONUS SIMULATION LABS
+              </h1>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold hidden sm:inline-block">
+                STAGE 01 C
               </span>
-              <span className="text-xs text-cyber-muted hidden sm:inline">• OPERATION ZERO-DAY</span>
             </div>
-            <h1 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">
-              HANDS-ON SIMULATION LABS (BONUS CREDITS)
-            </h1>
+            <p className="text-[10px] sm:text-xs text-slate-500">
+              Interactive practical puzzles designed for extra credit
+            </p>
           </div>
         </div>
 
-        {/* Score, Fullscreen Status & View Switcher */}
-        <div className="flex items-center gap-3">
-          {isFullscreen ? (
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-bold">FULLSCREEN ACTIVE</span>
+        <div className="flex items-center gap-3 ml-auto">
+          {fullscreenReady ? (
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>Fullscreen Active</span>
             </div>
           ) : (
             <button
               onClick={handleRestoreFullscreen}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500/30 text-xs font-bold transition-all animate-pulse"
-              title="Click to restore fullscreen"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 text-xs font-bold transition-all cursor-pointer animate-pulse"
             >
-              <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
-              <span>FULLSCREEN OFF • QUESTION HIDDEN</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+              <span>FULLSCREEN OFF</span>
             </button>
           )}
 
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded bg-black/40 border border-amber-400/30 text-xs">
-            <Award className="w-4 h-4 text-amber-400" />
-            <span className="text-cyber-muted">Bonus Earned:</span>
-            <span className="font-bold text-amber-400">+{totalScoreEarned} BONUS XP</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-xs font-mono">
+            <Award className="w-4 h-4 text-amber-600" />
+            <span className="text-slate-600">Bonus:</span>
+            <span className="font-bold text-amber-800">+{totalScoreEarned} BONUS XP</span>
           </div>
 
-          <div className="flex rounded border border-cyber-border overflow-hidden">
+          <div className="flex rounded-lg border border-slate-200 overflow-hidden bg-slate-100 p-0.5">
             <button
               onClick={() => setViewMode('games')}
-              className={`px-3 py-1.5 text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'games'
-                  ? 'bg-cyber-primary text-black'
-                  : 'bg-[#0D131F] text-cyber-muted hover:text-white'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Gamepad2 className="w-3.5 h-3.5" /> Puzzles
             </button>
             <button
               onClick={() => setViewMode('tree')}
-              className={`px-3 py-1.5 text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'tree'
-                  ? 'bg-cyber-primary text-black'
-                  : 'bg-[#0D131F] text-cyber-muted hover:text-white'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" /> Skill Tree
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Skill Tree
             </button>
           </div>
         </div>
@@ -293,23 +286,23 @@ export default function CyberArcade() {
       {/* Main Body */}
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
         {/* Stage 01 C Optional Bonus Notice Banner */}
-        <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="mb-6 p-4 rounded-xl bg-amber-50/70 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-start sm:items-center gap-3">
-            <div className="p-2 rounded bg-amber-500/20 text-amber-400 shrink-0">
-              <Sparkles className="w-4 h-4" />
+            <div className="p-2 rounded-lg bg-amber-100 text-amber-800 shrink-0">
+              <Sparkles className="w-4 h-4 text-amber-600" />
             </div>
             <div>
-              <div className="font-bold text-white uppercase tracking-wide flex items-center gap-2">
+              <div className="font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
                 <span>Stage 01 C: Simulation Labs</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">OPTIONAL • BONUS CREDITS</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 font-semibold">OPTIONAL • BONUS CREDITS</span>
               </div>
-              <p className="text-cyber-muted mt-0.5 leading-relaxed">
+              <p className="text-slate-600 mt-0.5 leading-relaxed">
                 Stage 01 C is completely optional. Each mastered simulation awards bonus points credited directly to your final recruitment profile.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] text-amber-400 font-bold px-3 py-1 bg-black/40 border border-amber-400/30 rounded">
+            <span className="text-[11px] text-amber-800 font-bold px-3 py-1 bg-white border border-amber-200 rounded-lg shadow-xs font-mono">
               +{totalScoreEarned} / 1,220 BONUS PTS
             </span>
           </div>
@@ -318,16 +311,16 @@ export default function CyberArcade() {
         {viewMode === 'tree' ? (
           <div className="space-y-6">
             <SkillUnlockTree />
-            <div className="p-4 rounded-lg bg-cyber-panel border border-cyber-border flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-xs">
               <div>
-                <h4 className="text-sm font-bold text-white">Ready for Personalized Technical Profiling?</h4>
-                <p className="text-xs text-cyber-muted mt-0.5">
+                <h4 className="text-sm font-bold text-slate-900">Ready for Personalized Technical Profiling?</h4>
+                <p className="text-xs text-slate-500 mt-0.5">
                   Declare your actual skills in Round 01 B and complete calibrated knowledge, application, and practical lab challenges.
                 </p>
               </div>
               <button
                 onClick={() => navigate('/technical-profile')}
-                className="px-4 py-2 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider rounded hover:bg-cyber-primary/90 flex items-center gap-2"
+                className="px-4 py-2 bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-slate-800 flex items-center gap-2 cursor-pointer shadow-xs"
               >
                 Enter Round 01 B <ChevronRight className="w-4 h-4" />
               </button>
@@ -337,7 +330,7 @@ export default function CyberArcade() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Sidebar: Game Roster */}
             <div className="lg:col-span-4 space-y-2.5">
-              <div className="flex items-center justify-between text-xs text-cyber-muted uppercase font-bold pb-1">
+              <div className="flex items-center justify-between text-xs text-slate-500 uppercase font-semibold pb-1 font-mono">
                 <span>Select Simulation ({ARCADE_GAMES.length})</span>
                 <span>{Object.keys(completedGames).length} Mastered</span>
               </div>
@@ -349,180 +342,118 @@ export default function CyberArcade() {
                   const isDone = !!completedGames[game.id];
 
                   return (
-                    <button
+                    <div
                       key={game.id}
-                      onClick={() => {
-                        setSelectedGameId(game.id);
-                        if (!isBrowserFullscreen()) {
-                          setShowWarningModal(true);
-                        }
-                      }}
-                      className={`w-full p-3 rounded border text-left transition-all flex items-start gap-3 ${
+                      onClick={() => setSelectedGameId(game.id)}
+                      className={`p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'border-cyber-primary bg-cyber-primary/15 text-white shadow-[0_0_15px_rgba(0,255,204,0.15)] ring-1 ring-cyber-primary'
-                          : isDone
-                          ? 'border-cyber-success/40 bg-cyber-success/5 text-slate-200'
-                          : 'border-cyber-border bg-[#0D131F] text-slate-300 hover:border-white/20'
+                          ? 'bg-sky-50 border-sky-500 shadow-xs'
+                          : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
                       }`}
                     >
-                      <div className={`p-2 rounded mt-0.5 ${
-                        isSelected
-                          ? 'bg-cyber-primary text-black'
-                          : isDone
-                          ? 'bg-cyber-success/20 text-cyber-success'
-                          : 'bg-black/50 text-cyber-primary border border-white/10'
-                      }`}>
-                        <Icon className="w-4 h-4" />
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`p-2 rounded-lg border shrink-0 ${
+                          isSelected 
+                            ? 'bg-sky-100 border-sky-200 text-sky-700' 
+                            : 'bg-slate-50 border-slate-200 text-slate-500'
+                        }`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-slate-900 truncate">
+                              {game.title}
+                            </span>
+                            {isDone && (
+                              <span className="text-[9px] px-1 rounded bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 font-mono">
+                                ✓
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-slate-500 block truncate font-mono">
+                            {game.category} • +{game.points} PTS
+                          </span>
+                        </div>
                       </div>
 
-                      <div className="overflow-hidden flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold truncate text-white">{game.title}</span>
-                          <span className="text-[10px] text-cyber-muted">+{game.points} XP</span>
-                        </div>
-                        <span className="text-[10px] text-cyber-muted block truncate mt-0.5">{game.category}</span>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                            game.difficulty === 'Advanced' ? 'bg-red-500/20 text-red-300' : game.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-300' : 'bg-emerald-500/20 text-emerald-300'
-                          }`}>
-                            {game.difficulty}
-                          </span>
-                          {isDone && (
-                            <span className="text-[9px] text-cyber-success font-bold uppercase">
-                              &bull; Mastered
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
+                      <ChevronRight className={`w-4 h-4 shrink-0 transition-transform ${isSelected ? 'text-sky-600 translate-x-0.5' : 'text-slate-400'}`} />
+                    </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Right Panel: Interactive Active Simulation */}
-            <div className="lg:col-span-8 space-y-4">
-              {!isFullscreen ? (
-                /* Disappeared Arcade Question Security Lockdown */
-                <div className="p-8 md:p-12 rounded-xl bg-[#080D1A] border-2 border-dashed border-red-500/50 text-center flex flex-col items-center justify-center space-y-5 shadow-[0_0_35px_rgba(239,68,68,0.2)] min-h-[460px] animate-fadeIn">
-                  <div className="w-16 h-16 rounded-full bg-red-500/15 border border-red-500/50 flex items-center justify-center text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.3)] animate-pulse">
-                    <EyeOff className="w-8 h-8" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold tracking-widest text-red-400 uppercase px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-full inline-block">
-                      INTEGRITY ENFORCEMENT ACTIVE
+            {/* Right Main Stage: Active Game Engine */}
+            <div className="lg:col-span-8 flex flex-col space-y-4">
+              {/* Game Metadata Header */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-3">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200 font-mono inline-block mb-1">
+                      {selectedGame.category}
                     </span>
-                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">
-                      ARCADE QUESTION DISAPPEARED
-                    </h3>
-                    <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-                      You have exited fullscreen mode. In accordance with Operation Zero-Day anti-cheat standards, interactive simulation questions and challenge mechanics are hidden in windowed mode.
-                    </p>
+                    <h2 className="text-lg font-bold text-slate-900">
+                      {selectedGame.title}
+                    </h2>
                   </div>
-
-                  <div className="p-4 bg-black/60 border border-red-500/30 rounded-lg max-w-md w-full text-left text-xs space-y-1.5 text-slate-300">
-                    <div className="flex items-center gap-2 text-red-400 font-bold">
-                      <ShieldAlert className="w-4 h-4 shrink-0" />
-                      <span>Security Notice: Windowed Mode Detected</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 leading-normal">
-                      The active arcade challenge <span className="text-cyber-primary font-semibold">"{currentGame.title}"</span> is currently suppressed. Restore continuous fullscreen mode to reveal and solve.
-                    </p>
+                  <div className="flex items-center gap-2 self-start sm:self-auto font-mono">
+                    <span className="text-xs px-2.5 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-800 font-bold">
+                      +{selectedGame.points} BONUS PTS
+                    </span>
+                    <span className="text-[10px] px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-600 uppercase font-semibold">
+                      {selectedGame.difficulty}
+                    </span>
                   </div>
-
-                  <button
-                    onClick={handleRestoreFullscreen}
-                    className="px-6 py-3.5 bg-gradient-to-r from-cyber-primary to-cyan-400 hover:from-cyber-primary/90 hover:to-cyan-400/90 text-black font-bold uppercase tracking-wider text-xs rounded-lg transition-all shadow-[0_0_25px_rgba(0,255,204,0.35)] flex items-center gap-2 transform hover:scale-[1.02] active:scale-95"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                    Restore Fullscreen & Reveal Question
-                  </button>
                 </div>
-              ) : (
-                /* Question and Interactive Simulation Lab (Active in Fullscreen) */
-                <>
-                  {/* Game Meta Header Card */}
-                  <div className="p-4 bg-[#090E1A] border border-cyber-border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase font-bold text-cyber-primary px-2 py-0.5 bg-cyber-primary/10 rounded border border-cyber-primary/30">
-                          {currentGame.category}
-                        </span>
-                        <span className="text-[10px] text-cyber-muted">Difficulty: {currentGame.difficulty}</span>
-                      </div>
-                      <h2 className="text-lg font-bold text-white mt-1 uppercase">{currentGame.title}</h2>
-                      <p className="text-xs text-cyber-muted mt-0.5">{currentGame.description}</p>
-                    </div>
 
-                    <div className="text-right shrink-0">
-                      <span className="text-xs text-cyber-muted block">Completion Reward</span>
-                      <span className="text-xl font-bold text-cyber-secondary font-mono">+{currentGame.points} XP</span>
-                    </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {selectedGame.description}
+                </p>
+
+                {activeMessage && (
+                  <div className="mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold animate-fadeIn flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <span>{activeMessage}</span>
                   </div>
+                )}
+              </div>
 
-                  {/* Render the Active Interactive Puzzle */}
-                  <InteractiveGameDispatcher
-                    key={currentGame.id}
-                    type={currentGame.type}
-                    onSolve={(_ans, isCorrect) => handleGameSolved(currentGame.id, currentGame.points, isCorrect)}
-                  />
-
-                  {/* Quick links to technical assessment */}
-                  <div className="p-3 bg-black/40 border border-white/5 rounded flex items-center justify-between text-xs text-cyber-muted">
-                    <span>Want to test in official competitive conditions?</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigate('/technical-profile')}
-                        className="text-cyber-primary hover:underline font-bold flex items-center gap-1"
-                      >
-                        Open Round 01 B Assessment <ExternalLink className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
+              {/* Interactive Game Dispatcher Viewport */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-xs min-h-[420px] flex items-center justify-center relative overflow-hidden">
+                <InteractiveGameDispatcher
+                  type={selectedGame.type}
+                  config={{}}
+                  disabled={false}
+                  onSolve={() => handleGameSolved(selectedGame.id, selectedGame.points)}
+                />
+              </div>
             </div>
+
           </div>
         )}
       </main>
 
-      {/* Fullscreen Exit Warning Modal */}
-      {showWarningModal && !isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="max-w-md w-full bg-[#0B0F19] border-2 border-red-500/60 rounded-xl p-6 shadow-[0_0_50px_rgba(239,68,68,0.3)] text-center space-y-4">
-            <div className="w-14 h-14 mx-auto rounded-full bg-red-500/20 border border-red-500/50 flex items-center justify-center text-red-400 animate-pulse">
-              <AlertTriangle className="w-7 h-7" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white uppercase tracking-wider">
-                FULLSCREEN MODE EXITED
-              </h3>
-              <p className="text-xs font-bold text-red-400 uppercase mt-1">
-                Arcade Challenge Has Disappeared
+      {/* Floating Fullscreen Warning Notice */}
+      {warningMessage && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm bg-white border border-red-200 p-4 rounded-2xl shadow-xl animate-scaleIn">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <span className="font-bold text-slate-900 block">Fullscreen Required</span>
+              <p className="text-slate-600 mt-1 leading-relaxed">
+                {warningMessage}
               </p>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed bg-black/50 p-3 rounded-lg border border-white/10 text-left">
-              ⚠️ <strong>INTEGRITY WARNING:</strong> Continuous fullscreen mode is strictly required during all technical exercises. The active question has been concealed to preserve evaluation integrity.
-            </p>
-            <div className="flex flex-col gap-2 pt-1">
               <button
                 onClick={handleRestoreFullscreen}
-                className="w-full py-3 bg-gradient-to-r from-cyber-primary to-cyan-400 text-black font-bold text-xs uppercase tracking-wider rounded-lg shadow-[0_0_20px_rgba(0,255,204,0.4)] hover:brightness-110 flex items-center justify-center gap-2"
+                className="mt-2.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-[11px] uppercase cursor-pointer"
               >
-                <Maximize2 className="w-4 h-4" />
-                Restore Fullscreen & Play
-              </button>
-              <button
-                onClick={() => setShowWarningModal(false)}
-                className="w-full py-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-medium text-xs rounded border border-white/10 transition-all"
-              >
-                Dismiss Notice (Keep Hidden)
+                Restore Fullscreen
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

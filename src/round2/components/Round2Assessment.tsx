@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { 
   PersonalizedAssessmentBlueprint, 
@@ -13,8 +13,6 @@ import { ROUND2_CHALLENGES } from '../data/challenges';
 import { PRACTICAL_TASKS } from '../data/practicalTasks';
 import FillInBlankModal from './FillInBlankModal';
 import PracticalCodeEditor from './PracticalCodeEditor';
-import { useStore } from '../../store/useStore';
-import { DOMAIN_METADATA } from '../data/skillTree';
 import { 
   Clock, 
   CheckCircle2, 
@@ -31,7 +29,6 @@ const cleanOptionText = (text: string) => text.replace(/^[A-Za-z0-9][.)]\s*/, ''
 
 export default function Round2Assessment() {
   const navigate = useNavigate();
-  const { candidate } = useStore();
 
   const [blueprint, setBlueprint] = useState<PersonalizedAssessmentBlueprint | null>(null);
   const [profile, setProfile] = useState<CandidateSkillProfile | null>(null);
@@ -85,8 +82,8 @@ export default function Round2Assessment() {
   }, []);
 
   useEffect(() => {
-    const rawBp = sessionStorage.getItem('r2_blueprint');
-    const rawProfile = sessionStorage.getItem('r2_profile');
+    const rawBp = localStorage.getItem('round2_blueprint');
+    const rawProfile = localStorage.getItem('round2_profile');
 
     if (!rawBp) {
       navigate('/technical-profile');
@@ -105,10 +102,15 @@ export default function Round2Assessment() {
     }
   }, [navigate]);
 
-  // Overall Countdown Timer
+  const currentChallengeId = blueprint?.orderedChallengeIds[currentIndex];
+  const currentChallenge: Round2Challenge | undefined = currentChallengeId 
+    ? ROUND2_CHALLENGES.find(c => c.id === currentChallengeId) 
+    : undefined;
+
+  // Global Session Timer
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeRemainingSeconds((prev) => {
+      setTimeRemainingSeconds(prev => {
         if (prev <= 1) {
           clearInterval(timer);
           finalizeAssessment();
@@ -119,273 +121,37 @@ export default function Round2Assessment() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [submissions, blueprint]);
+  }, [submissions]);
 
-  const currentChallengeId = blueprint?.orderedChallengeIds[currentIndex];
-  // Look up challenge from static bank or blueprint sections
-  let currentChallenge: Round2Challenge | undefined = undefined;
-  if (blueprint) {
-    for (const sec of blueprint.sections) {
-      const found = sec.challenges.find(c => c.id === currentChallengeId);
-      if (found) {
-        currentChallenge = found;
-        break;
-      }
-    }
-    if (!currentChallenge) {
-      currentChallenge = ROUND2_CHALLENGES.find(c => c.id === currentChallengeId);
-    }
-  }
-
-  // Active state refs for event listeners
-  const currentChallengeRef = useRef<Round2Challenge | undefined>(currentChallenge);
-  const currentIndexRef = useRef<number>(currentIndex);
-  const isSubmittedCurrentRef = useRef<boolean>(isSubmittedCurrent);
-  const blueprintRef = useRef<PersonalizedAssessmentBlueprint | null>(blueprint);
-  const finalizeAssessmentRef = useRef<(customSubs?: ChallengeSubmission[]) => void>(() => {});
-
+  // Fullscreen integrity monitoring
   useEffect(() => {
-    currentChallengeRef.current = currentChallenge;
-  }, [currentChallenge]);
-
-  useEffect(() => {
-    currentIndexRef.current = currentIndex;
-  }, [currentIndex]);
-
-  useEffect(() => {
-    isSubmittedCurrentRef.current = isSubmittedCurrent;
-  }, [isSubmittedCurrent]);
-
-  useEffect(() => {
-    blueprintRef.current = blueprint;
-  }, [blueprint]);
-
-  const finalizeAssessment = useCallback((customSubs?: ChallengeSubmission[]) => {
-    if (!blueprintRef.current) return;
-    const bp = blueprintRef.current;
-    const finalSubs = customSubs || submissions;
-
-    // Compile domain proficiency scores
-    const allDomains = Object.keys(DOMAIN_METADATA) as Round2Domain[];
-    const domainScores: Record<Round2Domain, DomainProficiencyScore> = {} as any;
-    const selectedDomainsList = profile?.selectedDomains || [];
-
-    allDomains.forEach((dom) => {
-      const isAssessed = selectedDomainsList.includes(dom);
-
-      if (!isAssessed) {
-        domainScores[dom] = {
-          domain: dom,
-          status: 'NOT_ASSESSED',
-          knowledgeScore: null,
-          applicationScore: null,
-          practicalScore: null,
-          overallDemonstrated: null,
-          challengesCount: 0
-        };
-      } else {
-        const domSubs = finalSubs.filter(s => s.domain === dom);
-        const kSubs = domSubs.filter(s => s.tier === 'knowledge');
-        const aSubs = domSubs.filter(s => s.tier === 'application' || s.tier === 'fill_in_blank');
-        const pSubs = domSubs.filter(s => s.tier === 'practical');
-
-        const kScore = kSubs.length > 0 
-          ? Math.max(0, Math.round((kSubs.reduce((acc, s) => acc + s.awardedScore, 0) / (kSubs.length * 100)) * 100))
-          : 80;
-        const aScore = aSubs.length > 0 
-          ? Math.max(0, Math.round((aSubs.reduce((acc, s) => acc + s.awardedScore, 0) / (aSubs.length * 100)) * 100))
-          : 75;
-        const pScore = pSubs.length > 0 
-          ? Math.max(0, Math.round((pSubs.reduce((acc, s) => acc + s.awardedScore, 0) / (pSubs.length * 100)) * 100))
-          : 85;
-
-        const overall = Math.max(0, Math.round((kScore * 0.3) + (aScore * 0.35) + (pScore * 0.35)));
-
-        let band: 'Beginner' | 'Basic' | 'Intermediate' | 'Advanced' | 'Mastery' = 'Basic';
-        if (overall >= 90) band = 'Mastery';
-        else if (overall >= 80) band = 'Advanced';
-        else if (overall >= 65) band = 'Intermediate';
-        else if (overall >= 45) band = 'Basic';
-        else band = 'Beginner';
-
-        domainScores[dom] = {
-          domain: dom,
-          status: 'ASSESSED',
-          claimedLevel: profile?.domainRatings[dom] || 'intermediate',
-          knowledgeScore: kScore,
-          applicationScore: aScore,
-          practicalScore: pScore,
-          overallDemonstrated: overall,
-          demonstratedBand: band,
-          challengesCount: domSubs.length
-        };
-      }
-    });
-
-    const assessedList = Object.values(domainScores)
-      .filter(d => d.status === 'ASSESSED' && d.overallDemonstrated !== null)
-      .sort((a, b) => (b.overallDemonstrated || 0) - (a.overallDemonstrated || 0));
-
-    const primaryStrength = assessedList[0]?.domain 
-      ? DOMAIN_METADATA[assessedList[0].domain].title 
-      : 'Technical Problem Solving';
-    const secondaryStrength = assessedList[1]?.domain 
-      ? DOMAIN_METADATA[assessedList[1].domain].title 
-      : undefined;
-    const emergingStrength = assessedList[2]?.domain 
-      ? DOMAIN_METADATA[assessedList[2].domain].title 
-      : undefined;
-
-    const totalEarned = finalSubs.reduce((acc, s) => acc + s.awardedScore, 0);
-    const maxPoss = bp.maxScore;
-
-    const result: TechnicalProfileResult = {
-      round2AttemptId: `r2-${candidate?.id || 'demo'}-${Date.now().toString(36)}`,
-      candidateId: candidate?.id || 'demo-user',
-      candidateName: candidate?.name || 'Candidate Operative',
-      scholarNumber: candidate?.scholarNumber || '00000',
-      completedAt: new Date().toISOString(),
-      totalScoreEarned: totalEarned,
-      maxScorePossible: maxPoss,
-      percentage: Math.max(0, Math.round((totalEarned / maxPoss) * 100)),
-      domainScores,
-      primaryStrength,
-      secondaryStrength,
-      emergingStrength,
-      submissions: finalSubs
-    };
-
-    sessionStorage.setItem('r2_result', JSON.stringify(result));
-    navigate('/round2-result');
-  }, [submissions, profile, candidate, navigate]);
-
-  useEffect(() => {
-    finalizeAssessmentRef.current = finalizeAssessment;
-  }, [finalizeAssessment]);
-
-  // Robust Cross-Browser Fullscreen integrity listener
-  useEffect(() => {
-    // 450ms initial check grace period to allow browser fullscreen transition from button click to resolve
-    const mountCheckTimer = setTimeout(() => {
+    const handleFullscreenState = () => {
       if (!isBrowserFullscreen()) {
         setShowFullscreenModal(true);
-      }
-    }, 450);
-
-    const handleFullscreenChange = () => {
-      const isFs = isBrowserFullscreen();
-      if (!isFs) {
-        const activeChal = currentChallengeRef.current;
-        const isSubmitted = isSubmittedCurrentRef.current;
-        const bp = blueprintRef.current;
-        const cIdx = currentIndexRef.current;
-
-        if (activeChal && !isSubmitted) {
-          const skippedTitle = activeChal.title;
-
-          // Deduct -50 PTS negative marking penalty and skip
-          const skippedSubmission: ChallengeSubmission = {
-            challengeId: activeChal.id,
-            domain: activeChal.domain,
-            tier: activeChal.tier,
-            userAnswer: '[SKIPPED DUE TO FULLSCREEN VIOLATION]',
-            awardedScore: -50,
-            maxScore: activeChal.points,
-            isCorrect: false,
-            timeSpentSeconds: 0,
-            timestamp: new Date().toISOString()
-          };
-
-          const updatedSubs = [...submissions, skippedSubmission];
-          setSubmissions(updatedSubs);
-
-          // Advance to next challenge
-          if (bp && cIdx + 1 < bp.orderedChallengeIds.length) {
-            setCurrentIndex(cIdx + 1);
-          } else {
-            finalizeAssessmentRef.current(updatedSubs);
-          }
-
-          setSelectedOption('');
-          setIsSubmittedCurrent(false);
-          setViolationCount(prev => prev + 1);
-
-          setViolationNotice(
-            `CRITICAL INTEGRITY VIOLATION: FULLSCREEN EXITED!\n\nQuestion "${skippedTitle}" was immediately SKIPPED and a -50 POINTS NEGATIVE MARKING penalty has been deducted from your score!\n\n⚠️ DO NOT EXIT FULLSCREEN AGAIN! Continuous fullscreen mode is strictly mandatory throughout Round 01 B.`
-          );
-          setShowFullscreenModal(true);
-        } else {
-          setViolationNotice(
-            `SECURITY WARNING: FULLSCREEN EXITED!\n\nContinuous fullscreen mode is strictly mandatory during Round 01 B. Exiting fullscreen during an active question will skip it with -50 PTS negative marking!\n\nPlease restore fullscreen immediately to continue.`
-          );
-          setShowFullscreenModal(true);
-        }
+        setViolationCount(prev => prev + 1);
+        setViolationNotice('FULLSCREEN EXITED: Continuous fullscreen mode is required during the technical examination.');
       } else {
         setShowFullscreenModal(false);
       }
     };
 
-    FULLSCREEN_EVENTS.forEach((evt) => {
-      document.addEventListener(evt, handleFullscreenChange);
-    });
+    FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenState));
+    if (!isBrowserFullscreen()) {
+      setShowFullscreenModal(true);
+    }
 
     return () => {
-      clearTimeout(mountCheckTimer);
-      FULLSCREEN_EVENTS.forEach((evt) => {
-        document.removeEventListener(evt, handleFullscreenChange);
-      });
+      FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenState));
     };
-  }, [submissions]);
+  }, []);
 
-  // Handle Tab Switch in Round 01 B: skip active question, deduct -50 PTS, and advance to next challenge
+  // Anti-Cheat: Tab switch & visibility monitoring
   useEffect(() => {
     const handleTabSwitch = () => {
       if (document.hidden) {
-        const activeChal = currentChallengeRef.current;
-        const isSubmitted = isSubmittedCurrentRef.current;
-        const bp = blueprintRef.current;
-        const cIdx = currentIndexRef.current;
-
-        if (activeChal && !isSubmitted) {
-          const skippedTitle = activeChal.title;
-
-          // Deduct -50 PTS negative marking penalty and skip
-          const skippedSubmission: ChallengeSubmission = {
-            challengeId: activeChal.id,
-            domain: activeChal.domain,
-            tier: activeChal.tier,
-            userAnswer: '[SKIPPED DUE TO TAB SWITCH VIOLATION]',
-            awardedScore: -50,
-            maxScore: activeChal.points,
-            isCorrect: false,
-            timeSpentSeconds: 0,
-            timestamp: new Date().toISOString()
-          };
-
-          const updatedSubs = [...submissions, skippedSubmission];
-          setSubmissions(updatedSubs);
-
-          // Advance to next challenge
-          if (bp && cIdx + 1 < bp.orderedChallengeIds.length) {
-            setCurrentIndex(cIdx + 1);
-          } else {
-            finalizeAssessmentRef.current(updatedSubs);
-          }
-
-          setSelectedOption('');
-          setIsSubmittedCurrent(false);
-          setViolationCount(prev => prev + 1);
-
-          setViolationNotice(
-            `CRITICAL INTEGRITY VIOLATION: TAB SWITCH DETECTED!\n\nYou switched tabs or minimized the browser window.\n\nQuestion "${skippedTitle}" was immediately SKIPPED and a -50 POINTS NEGATIVE MARKING penalty has been deducted from your score!\n\n⚠️ DO NOT SWITCH TABS AGAIN! Continuous focus on the assessment tab is strictly mandatory.`
-          );
-          setShowFullscreenModal(true);
-        } else {
-          setViolationNotice(
-            `SECURITY WARNING: TAB SWITCH DETECTED!\n\nTab switching is strictly monitored during Round 01 B. Switching tabs while answering an active challenge will immediately skip it with -50 PTS negative marking!\n\nPlease remain focused on the assessment tab.`
-          );
-          setShowFullscreenModal(true);
-        }
+        setViolationCount(prev => prev + 1);
+        setViolationNotice('TAB SWITCH RECORDED: You navigated away from the assessment tab. This event is logged in your candidate dossier.');
+        setShowFullscreenModal(true);
       }
     };
 
@@ -446,14 +212,6 @@ export default function Round2Assessment() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   });
-
-  if (!blueprint) {
-    return (
-      <div className="min-h-screen bg-[#05070D] flex items-center justify-center font-mono-cyber text-cyber-primary">
-        INITIALIZING PERSONALIZED TECHNICAL ENVIRONMENT...
-      </div>
-    );
-  }
 
   const handleMcqSubmit = () => {
     if (!currentChallenge || !selectedOption || isSubmittedCurrent) return;
@@ -526,29 +284,98 @@ export default function Round2Assessment() {
     setSelectedOption('');
     setIsSubmittedCurrent(false);
 
-    if (currentIndex + 1 < blueprint.orderedChallengeIds.length) {
+    if (currentIndex + 1 < (blueprint?.orderedChallengeIds.length || 0)) {
       setCurrentIndex(prev => prev + 1);
     } else {
       finalizeAssessment();
     }
   };
 
+  const finalizeAssessment = () => {
+    if (!profile || !blueprint) return;
+
+    const totalAwarded = submissions.reduce((sum, s) => sum + s.awardedScore, 0);
+    const totalMax = submissions.reduce((sum, s) => sum + s.maxScore, 0);
+
+    const domainScores: Record<Round2Domain, DomainProficiencyScore> = {} as any;
+
+    const domainsList: Round2Domain[] = [
+      'WEB_DEVELOPMENT', 'PROGRAMMING', 'DSA', 'CYBERSECURITY', 
+      'NETWORKING', 'DATABASE_SQL', 'LINUX_CLI', 'GIT_GITHUB', 'CLOUD_DEVOPS', 'OTHER'
+    ];
+
+    domainsList.forEach(domain => {
+      const isAssessed = profile.selectedDomains.includes(domain);
+      const domainSubs = submissions.filter(s => s.domain === domain);
+      const earned = domainSubs.reduce((sum, s) => sum + s.awardedScore, 0);
+      const maxPossible = domainSubs.reduce((sum, s) => sum + s.maxScore, 0);
+      const pct = maxPossible > 0 ? Math.round((earned / maxPossible) * 100) : 0;
+
+      domainScores[domain] = {
+        domain,
+        status: isAssessed ? 'ASSESSED' : 'NOT_ASSESSED',
+        claimedLevel: profile.domainRatings[domain],
+        knowledgeScore: isAssessed ? pct : null,
+        applicationScore: isAssessed ? pct : null,
+        practicalScore: isAssessed ? pct : null,
+        overallDemonstrated: isAssessed ? pct : null,
+        demonstratedBand: pct >= 80 ? 'Advanced' : pct >= 50 ? 'Intermediate' : pct > 0 ? 'Basic' : 'Beginner',
+        challengesCount: domainSubs.length
+      };
+    });
+
+    const evaluatedDomains = Object.values(domainScores).filter(d => d.status === 'ASSESSED');
+    const sortedDomains = [...evaluatedDomains].sort((a, b) => (b.overallDemonstrated || 0) - (a.overallDemonstrated || 0));
+
+    const result: TechnicalProfileResult = {
+      round2AttemptId: `r2-${Date.now()}`,
+      candidateId: profile.candidateId,
+      candidateName: (profile as any).candidateName || 'Candidate',
+      scholarNumber: (profile as any).scholarNumber || '12345',
+      totalScoreEarned: totalAwarded,
+      maxScorePossible: totalMax,
+      percentage: totalMax > 0 ? Math.round((totalAwarded / totalMax) * 100) : 0,
+      domainScores,
+      primaryStrength: sortedDomains[0]?.domain || 'Technical Fundamentals',
+      secondaryStrength: sortedDomains[1]?.domain,
+      emergingStrength: sortedDomains[2]?.domain,
+      submissions,
+      completedAt: new Date().toISOString()
+    };
+
+    try {
+      localStorage.setItem('round2_result', JSON.stringify(result));
+    } catch (e) {
+      console.error(e);
+    }
+
+    navigate('/technical-result');
+  };
+
   const currentPracticalTask = currentChallenge?.practicalTaskId 
     ? PRACTICAL_TASKS[currentChallenge.practicalTaskId] 
     : undefined;
 
+  if (!blueprint) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center font-mono text-sky-700 text-xs">
+        INITIALIZING TECHNICAL ASSESSMENT ENVIRONMENT...
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#05070D] text-cyber-text flex flex-col font-mono-cyber select-none">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans select-none">
       
       {/* Top Fixed HUD Banner */}
-      <div className="bg-[#0B1018] border-b border-cyber-border px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-30 shadow-lg">
+      <div className="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-30 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-cyber-primary animate-ping" />
+          <div className="w-2.5 h-2.5 rounded-full bg-sky-600 animate-ping" />
           <div>
-            <h1 className="text-xs md:text-sm font-bold text-white tracking-widest uppercase">
+            <h1 className="text-xs md:text-sm font-bold text-slate-900 tracking-wider uppercase">
               ROUND 01 B • TECHNICAL ASSESSMENT
             </h1>
-            <p className="text-[10px] text-cyber-muted">
+            <p className="text-[10px] text-slate-500 font-mono">
               CHALLENGE {currentIndex + 1} OF {blueprint.orderedChallengeIds.length} • {currentChallenge?.domain || 'TECHNICAL'}
             </p>
           </div>
@@ -559,12 +386,12 @@ export default function Round2Assessment() {
           {blueprint.orderedChallengeIds.map((_, idx) => (
             <div
               key={idx}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
+              className={`w-2 h-2 rounded-full transition-all ${
                 idx === currentIndex
-                  ? 'bg-cyber-primary ring-4 ring-cyber-primary/20 scale-125'
+                  ? 'bg-sky-600 ring-4 ring-sky-100 scale-125'
                   : idx < currentIndex
-                  ? 'bg-cyber-success'
-                  : 'bg-white/10'
+                  ? 'bg-emerald-500'
+                  : 'bg-slate-200'
               }`}
             />
           ))}
@@ -573,24 +400,24 @@ export default function Round2Assessment() {
         {/* Right HUD Controls: Webcam + Fullscreen + Timer */}
         <div className="flex items-center gap-3">
           {/* Proctoring Webcam Mini-Pip */}
-          <div className="relative w-12 h-9 sm:w-14 sm:h-10 bg-black border border-cyber-border rounded overflow-hidden shrink-0">
+          <div className="relative w-12 h-9 sm:w-14 sm:h-10 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
             <video
               ref={proctorVideoRef}
               autoPlay
               muted
               playsInline
-              className="w-full h-full object-cover mirror"
+              className="w-full h-full object-cover -scale-x-100"
             />
-            <div className="absolute top-1 right-1 flex items-center gap-1 bg-black/70 px-1 py-0.2 rounded text-[8px]">
-              <span className={`w-1.5 h-1.5 rounded-full ${cameraActive ? 'bg-cyber-success animate-pulse' : 'bg-red-500'}`} />
-              <span className="text-white hidden md:inline">PROCTOR</span>
+            <div className="absolute top-1 right-1 flex items-center gap-1 bg-white/90 px-1 py-0.2 rounded text-[8px] font-mono shadow-xs">
+              <span className={`w-1.5 h-1.5 rounded-full ${cameraActive ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="text-slate-800 hidden md:inline">PROCTOR</span>
             </div>
           </div>
 
           {/* Fullscreen Button */}
           <button
             onClick={requestFullscreen}
-            className="p-2 rounded bg-[#05070D] hover:bg-white/5 border border-cyber-border text-cyber-muted hover:text-cyber-primary transition-all text-xs flex items-center gap-1.5"
+            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition-all text-xs flex items-center gap-1.5 cursor-pointer"
             title="Toggle Fullscreen"
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -598,9 +425,9 @@ export default function Round2Assessment() {
           </button>
 
           {/* Countdown Timer */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#05070D] border border-cyber-border rounded text-xs">
-            <Clock className="w-4 h-4 text-cyber-warning" />
-            <span className={timeRemainingSeconds < 180 ? 'text-cyber-danger font-bold animate-pulse' : 'text-cyber-primary font-bold'}>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono">
+            <Clock className="w-4 h-4 text-amber-600" />
+            <span className={timeRemainingSeconds < 180 ? 'text-red-600 font-bold animate-pulse' : 'text-slate-900 font-bold'}>
               {Math.floor(timeRemainingSeconds / 60)}:{(timeRemainingSeconds % 60).toString().padStart(2, '0')}
             </span>
           </div>
@@ -633,24 +460,24 @@ export default function Round2Assessment() {
          currentChallenge.tier !== 'fill_in_blank' && 
          currentChallenge.tier !== 'subjective' && 
          currentChallenge.tier !== 'practical' && (
-          <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[85vh] shadow-2xl rounded-xl animate-scaleIn overflow-hidden my-auto font-sans">
+          <div className="w-full max-w-3xl bg-white border border-slate-200 flex flex-col max-h-[85vh] shadow-xl rounded-2xl animate-scaleIn overflow-hidden my-auto font-sans">
             
             {/* Challenge Header - Fixed */}
-            <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18] shrink-0">
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-50 text-sky-700 border border-sky-200 rounded">
                     {currentChallenge.tier === 'knowledge' ? 'TIER 1 • KNOWLEDGE' : 'TIER 2 • APPLICATION'}
                   </span>
-                  <span className="text-[10px] text-slate-400 uppercase">
+                  <span className="text-[10px] text-slate-500 uppercase font-mono">
                     {currentChallenge.domain} • {currentChallenge.subSkill}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-1">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight mt-1">
                   {currentChallenge.title}
                 </h2>
               </div>
-              <div className="text-xs px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md shrink-0">
+              <div className="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold rounded-md shrink-0">
                 +{currentChallenge.points} PTS
               </div>
             </div>
@@ -658,7 +485,7 @@ export default function Round2Assessment() {
             {/* Scrollable Content Body */}
             <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
               {/* Prompt Box */}
-              <div className="p-4 bg-[#070A12] border border-white/[0.06] rounded-lg leading-relaxed text-sm text-slate-200 whitespace-pre-wrap">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed text-sm text-slate-800 whitespace-pre-wrap">
                 {currentChallenge.prompt}
               </div>
 
@@ -666,11 +493,11 @@ export default function Round2Assessment() {
               {currentChallenge.options && (
                 <div className="space-y-2.5">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
                       SELECT YOUR ANSWER:
                     </p>
-                    <span className="text-[11px] text-slate-400 hidden sm:inline-block">
-                      Tip: Press <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">D</kbd> or <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">↵ ENTER</kbd>
+                    <span className="text-[11px] text-slate-500 hidden sm:inline-block">
+                      Tip: Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">D</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">↵ ENTER</kbd>
                     </span>
                   </div>
 
@@ -682,14 +509,14 @@ export default function Round2Assessment() {
                         type="button"
                         disabled={isSubmittedCurrent}
                         onClick={() => setSelectedOption(opt)}
-                        className={`w-full text-left p-3.5 text-sm transition-all rounded-lg flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
+                        className={`w-full text-left p-3.5 text-sm transition-all rounded-xl flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
                           isSelected
-                            ? 'border border-sky-500/80 bg-sky-500/10 text-white font-medium'
-                            : 'border border-white/[0.08] bg-[#0A0F1D] text-slate-300 hover:border-white/20 hover:text-white hover:bg-[#0E1528]'
+                            ? 'border border-sky-500 bg-sky-50 text-slate-900 font-semibold ring-1 ring-sky-500/20'
+                            : 'border border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:bg-slate-50'
                         }`}
                       >
                         <span className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border transition-colors ${
-                          isSelected ? 'border-sky-500 bg-sky-500 text-slate-950 font-bold' : 'border-white/15 text-slate-400 bg-white/[0.03]'
+                          isSelected ? 'border-sky-600 bg-sky-600 text-white font-bold' : 'border-slate-300 text-slate-500 bg-slate-100'
                         }`}>
                           {String.fromCharCode(65 + idx)}
                         </span>
@@ -702,21 +529,21 @@ export default function Round2Assessment() {
 
               {/* Neutral Response Recorded Confirmation */}
               {isSubmittedCurrent && (
-                <div className="p-3.5 border border-sky-500/30 bg-sky-500/10 rounded-lg flex items-center justify-between text-sky-300 animate-fadeIn">
+                <div className="p-3.5 border border-emerald-200 bg-emerald-50 rounded-xl flex items-center justify-between text-emerald-800 animate-fadeIn">
                   <div className="flex items-center gap-2.5 text-sm font-semibold">
-                    <CheckCircle2 className="w-5 h-5 text-sky-400" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                     <span>RESPONSE RECORDED</span>
                   </div>
-                  <span className="text-xs text-slate-400 hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
+                  <span className="text-xs text-slate-500 hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
                 </div>
               )}
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex justify-between items-center px-6 py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <CornerDownLeft className="w-4 h-4 text-sky-400" />
-                <span>Press <kbd className="px-1.5 py-0.5 bg-black/40 border border-white/15 text-white rounded font-mono text-[10px]">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
+            <div className="flex justify-between items-center px-6 py-4 border-t border-slate-200 bg-slate-50 shrink-0">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <CornerDownLeft className="w-4 h-4 text-sky-600" />
+                <span>Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 text-slate-800 rounded font-mono text-[10px]">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
               </div>
 
               {!isSubmittedCurrent ? (
@@ -724,19 +551,19 @@ export default function Round2Assessment() {
                   type="button"
                   onClick={handleMcqSubmit}
                   disabled={!selectedOption}
-                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4 text-sky-600" />
+                  <Sparkles className="w-4 h-4 text-sky-400" />
                   <span>SUBMIT ANSWER [ ↵ ]</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-2"
                 >
                   <span>NEXT CHALLENGE [ ↵ ]</span>
-                  <ArrowRight className="w-4 h-4 text-slate-950" />
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </button>
               )}
             </div>
@@ -748,59 +575,34 @@ export default function Round2Assessment() {
 
       {/* Fullscreen Required / Exit Warning Modal */}
       {showFullscreenModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md pointer-events-auto p-4 select-none font-mono-cyber">
-          <div className="w-full max-w-lg cyber-panel p-8 border-2 border-red-500 text-center shadow-[0_0_60px_rgba(239,68,68,0.5)] rounded-lg animate-scaleIn">
-            <div className="w-16 h-16 rounded-full bg-red-950/40 border-2 border-red-500 flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <AlertTriangle className="w-8 h-8 text-red-500" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 select-none">
+          <div className="w-full max-w-lg bg-white p-6 border border-red-200 text-center shadow-xl rounded-2xl animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
 
-            <span className="text-[10px] uppercase font-bold tracking-widest px-3 py-1 bg-red-500/10 border border-red-500/30 text-red-400 rounded inline-block mb-2">
-              COMPETITIVE INTEGRITY ENFORCEMENT
-            </span>
+            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">
+              Fullscreen Mode Mandatory
+            </h3>
 
-            <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight">
-              FULLSCREEN MODE REQUIRED
-            </h2>
-
-            <p className="text-xs text-slate-300 mt-2 max-w-md mx-auto leading-relaxed">
-              Round 01 B is an official technical skill assessment. Candidates are strictly required to maintain continuous fullscreen mode. Exiting fullscreen or tab switching triggers an immediate penalty!
+            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+              {violationNotice || 'Recruitment integrity policies require uninterrupted fullscreen mode throughout Round 01 B.'}
             </p>
 
-            {violationNotice ? (
-              <div className="mt-4 p-4 bg-red-950/60 border-2 border-red-500/60 rounded text-xs text-red-200 text-left whitespace-pre-wrap leading-relaxed shadow-lg">
-                <div className="flex items-center gap-2 text-red-400 font-bold mb-1.5 uppercase tracking-wider text-[11px]">
-                  <ShieldAlert className="w-4 h-4 shrink-0" />
-                  <span>INTEGRITY PENALTY RECORDED:</span>
-                </div>
-                {violationNotice}
-                {violationCount > 1 && (
-                  <p className="mt-2 pt-2 border-t border-red-500/30 text-[11px] text-red-300 font-bold">
-                    Total violations logged: {violationCount}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div className="mt-4 p-3 bg-red-950/40 border border-red-500/30 rounded text-xs text-red-300">
-                Please enter fullscreen mode to begin or continue your calibrated technical assessment.
-              </div>
-            )}
-
-            <div className="mt-6 flex flex-col gap-3">
-              <button
-                onClick={requestFullscreen}
-                className="w-full py-4 bg-cyber-primary text-black font-extrabold text-xs uppercase tracking-wider rounded hover:bg-white transition-all shadow-[0_0_25px_rgba(0,255,204,0.35)] flex items-center justify-center gap-2 cursor-pointer transform active:scale-95"
-              >
-                <Maximize2 className="w-4 h-4" />
-                RESTORE FULLSCREEN & CONTINUE TEST &rarr;
-              </button>
-
-              <button
-                onClick={() => navigate('/technical-profile')}
-                className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-cyber-muted hover:text-white text-xs font-bold uppercase tracking-wider rounded border border-white/10 transition-all cursor-pointer"
-              >
-                Return to Skill Setup
-              </button>
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-left text-xs text-red-800 flex items-center gap-2.5">
+              <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
+              <span>
+                Violations Recorded: <strong>{violationCount}</strong>. Continued tab or app switching will result in automatic session termination.
+              </span>
             </div>
+
+            <button
+              onClick={requestFullscreen}
+              className="mt-6 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span>RETURN TO FULLSCREEN & RESUME</span>
+            </button>
           </div>
         </div>
       )}
