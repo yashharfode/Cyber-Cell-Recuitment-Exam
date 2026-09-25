@@ -4,6 +4,8 @@ import {
   Play, 
   Terminal, 
   X, 
+  Menu,
+  Shield,
   Lock, 
   Unlock, 
   ShieldCheck, 
@@ -20,6 +22,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { setMode, isRound1Submitted, setRound1Submitted, score, completedMissionIds, attemptId } = useStore();
   const [activeModal, setActiveModal] = useState<'howItWorks' | 'requirements' | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isR1Complete = 
     isRound1Submitted || 
@@ -61,52 +64,143 @@ export default function LandingPage() {
       <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[250px] bg-indigo-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       {/* ========================================================================= */}
-      {/* 1. PROFESSIONAL PRODUCT HEADER                                            */}
+      {/* 1. CLEAN MODERN ENTERPRISE NAVBAR                                         */}
       {/* ========================================================================= */}
-      <header className="relative z-20 border-b border-white/[0.08] bg-[#080C14]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-30 border-b border-white/[0.08] bg-[#080C14]/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-3.5 flex items-center justify-between">
           
-          {/* Organization Identity */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#0F172A] border border-white/[0.12] flex items-center justify-center font-mono text-xs font-bold text-sky-400 shadow-sm relative group overflow-hidden">
-              <span className="relative z-10">CC</span>
-              <div className="absolute inset-0 bg-sky-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+          {/* Left: Organization Identity / Brand */}
+          <div 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:border-sky-500/40 transition-colors">
+              <Shield className="w-4 h-4 text-sky-400" />
             </div>
             
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-bold tracking-tight text-white uppercase">
-                  CYBER CELL
-                </span>
-                <span className="text-[9px] sm:text-[10px] font-mono text-sky-400 px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
-                  SATI
-                </span>
-              </div>
-              <span className="text-[10px] sm:text-xs text-slate-400">
-                Samrat Ashok Technological Institute, Vidisha
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors">
+                Cyber Cell
+              </span>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/[0.05] border border-white/[0.08] px-1.5 py-0.5 rounded">
+                SATI Vidisha
               </span>
             </div>
           </div>
 
-          {/* Center Badge (Desktop) */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs font-medium text-slate-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-            <span className="font-mono text-[11px] tracking-wide">TECHNICAL RECRUITMENT 2026</span>
-          </div>
+          {/* Center: Real Functional Navigation Links (Desktop) */}
+          <nav className="hidden md:flex items-center gap-7 text-xs font-medium text-slate-400">
+            <button 
+              onClick={() => {
+                document.getElementById('stages')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Stages
+            </button>
+            <button 
+              onClick={() => setActiveModal('howItWorks')}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Format & Rules
+            </button>
+            <button 
+              onClick={() => setActiveModal('requirements')}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Requirements
+            </button>
+            <button 
+              onClick={() => navigate('/arcade')}
+              className="hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 text-slate-300"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span>Bonus Labs</span>
+            </button>
+          </nav>
 
-          {/* Right Status Indicator */}
+          {/* Right: Actions (Admin & Primary CTA) */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[#0F172A] border border-white/[0.08] text-[11px] sm:text-xs font-mono">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-              </span>
-              <span className="text-slate-400 hidden sm:inline">STATUS:</span>
-              <span className="text-white font-medium">ACTIVE</span>
-            </div>
+            <button
+              onClick={() => navigate('/admin')}
+              className="hidden lg:inline-flex text-xs text-slate-400 hover:text-white transition-colors cursor-pointer px-2.5 py-1"
+            >
+              Admin Portal
+            </button>
+
+            <button
+              onClick={startRecruitment}
+              className="h-9 px-4 rounded-lg bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs tracking-wide transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>Candidate Login</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Mobile Hamburger Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
 
         </div>
+
+        {/* Mobile Navigation Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/[0.08] bg-[#0A0F1D] px-5 py-4 space-y-3 animate-fadeIn">
+            <div className="flex flex-col space-y-2 text-xs text-slate-300 font-medium">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  document.getElementById('stages')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-left py-2 hover:text-white transition-colors cursor-pointer"
+              >
+                Assessment Stages
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setActiveModal('howItWorks');
+                }}
+                className="text-left py-2 hover:text-white transition-colors cursor-pointer"
+              >
+                Assessment Format & Rules
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setActiveModal('requirements');
+                }}
+                className="text-left py-2 hover:text-white transition-colors cursor-pointer"
+              >
+                System Requirements
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate('/arcade');
+                }}
+                className="text-left py-2 text-amber-400 hover:text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                <span>Bonus Simulation Labs</span>
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  navigate('/admin');
+                }}
+                className="text-left py-2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                Admin Evaluation Portal
+              </button>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ========================================================================= */}
@@ -284,7 +378,7 @@ export default function LandingPage() {
         {/* ========================================================================= */}
         {/* 3. THE THREE ASSESSMENT STAGES (Clean 3-Card Grid)                        */}
         {/* ========================================================================= */}
-        <div className="mt-10 sm:mt-14 pt-8 border-t border-white/[0.08]">
+        <div id="stages" className="mt-10 sm:mt-14 pt-8 border-t border-white/[0.08] scroll-mt-20">
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-5">
             <div>
