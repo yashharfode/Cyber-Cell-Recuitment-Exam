@@ -8,16 +8,18 @@ import {
   Unlock, 
   ShieldCheck, 
   ChevronRight,
-  Sliders,
+  ArrowRight,
   HelpCircle,
-  Monitor
+  Monitor,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const { setMode, isRound1Submitted, setRound1Submitted, score, completedMissionIds, attemptId } = useStore();
-  const [activeModal, setActiveModal] = useState<'controls' | 'howItWorks' | 'requirements' | null>(null);
+  const [activeModal, setActiveModal] = useState<'howItWorks' | 'requirements' | null>(null);
 
   const isR1Complete = 
     isRound1Submitted || 
@@ -40,252 +42,239 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 font-sans flex flex-col justify-between relative">
+    <div className="min-h-screen bg-[#080C14] text-slate-100 font-sans flex flex-col justify-between relative overflow-x-hidden selection:bg-sky-500/20 selection:text-sky-200">
       
-      {/* Background Architectural Grid: Controlled, subtle, enterprise-grade */}
+      {/* Background Architectural Grid: Subtle & Enterprise-Grade */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.025]"
+        className="absolute inset-0 pointer-events-none opacity-[0.03]"
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 1px, transparent 1px)
+            linear-gradient(to right, rgba(255, 255, 255, 0.3) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 1px, transparent 1px)
           `,
-          backgroundSize: '48px 48px'
+          backgroundSize: '40px 40px'
         }}
       />
       
-      {/* Restrained ambient glow */}
-      <div className="absolute top-0 left-1/3 w-[500px] h-[300px] bg-sky-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
+      {/* Restrained Ambient Radial Glow with Gentle Breathing Animation */}
+      <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-sky-500/[0.04] rounded-full blur-[140px] pointer-events-none animate-pulseGlow" />
+      <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[250px] bg-indigo-500/[0.03] rounded-full blur-[120px] pointer-events-none" />
 
       {/* ========================================================================= */}
       {/* 1. PROFESSIONAL PRODUCT HEADER                                            */}
       {/* ========================================================================= */}
       <header className="relative z-20 border-b border-white/[0.08] bg-[#080C14]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-3.5 sm:py-4 flex items-center justify-between">
           
           {/* Organization Identity */}
-          <div className="flex items-center gap-3.5">
-            {/* Cyber Cell Emblem */}
-            <div className="w-10 h-10 rounded-lg bg-[#0F172A] border border-white/[0.12] flex items-center justify-center relative overflow-hidden group shadow-sm">
-              <div className="relative font-mono text-xs font-bold tracking-tight text-sky-400">
-                CC
-              </div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#0F172A] border border-white/[0.12] flex items-center justify-center font-mono text-xs font-bold text-sky-400 shadow-sm relative group overflow-hidden">
+              <span className="relative z-10">CC</span>
+              <div className="absolute inset-0 bg-sky-400/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold tracking-tight text-white uppercase">
+                <span className="text-xs sm:text-sm font-bold tracking-tight text-white uppercase">
                   CYBER CELL
                 </span>
-                <span className="text-[10px] font-mono text-sky-400 px-1.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
+                <span className="text-[9px] sm:text-[10px] font-mono text-sky-400 px-1.5 py-0.2 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
                   SATI
                 </span>
               </div>
-              <span className="text-xs text-slate-400">
-                Cybersecurity Club • SATI Vidisha
+              <span className="text-[10px] sm:text-xs text-slate-400">
+                Samrat Ashok Technological Institute, Vidisha
               </span>
             </div>
           </div>
 
           {/* Center Badge (Desktop) */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-lg bg-white/[0.03] border border-white/[0.08] text-xs font-medium text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-            <span>TECHNICAL RECRUITMENT 2026</span>
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs font-medium text-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <span className="font-mono text-[11px] tracking-wide">TECHNICAL RECRUITMENT 2026</span>
           </div>
 
           {/* Right Status Indicator */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F172A] border border-white/[0.08] text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-slate-400 hidden sm:inline">SYSTEM STATUS:</span>
-              <span className="text-white font-medium">OPERATIONAL</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[#0F172A] border border-white/[0.08] text-[11px] sm:text-xs font-mono">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              <span className="text-slate-400 hidden sm:inline">STATUS:</span>
+              <span className="text-white font-medium">ACTIVE</span>
             </div>
           </div>
+
         </div>
       </header>
 
       {/* ========================================================================= */}
-      {/* 2. HERO SECTION: 12-COLUMN ASYMMETRIC GRID                                */}
+      {/* 2. HERO SECTION                                                           */}
       {/* ========================================================================= */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 lg:px-12 py-10 lg:py-16 flex flex-col justify-center">
+      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-14 flex flex-col justify-center animate-fadeIn">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* LEFT COLUMN: Editorial Typography & Intentional Actions */}
-          <div className="lg:col-span-7 flex flex-col items-start space-y-6">
+          {/* LEFT COLUMN: Clean Title, Objective & Call to Action */}
+          <div className="lg:col-span-7 flex flex-col items-start space-y-5 sm:space-y-6">
             
-            {/* Eyebrow Label */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono uppercase tracking-wider text-sky-400 font-semibold">
-                ROUND 01 • TECHNICAL EVALUATION
-              </span>
-              <span className="text-white/20">•</span>
-              <span className="text-xs font-mono text-slate-400">
-                VER 01.0
-              </span>
+            {/* Minimal Eyebrow Tag */}
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-mono font-medium">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>OFFICIAL ENTRANCE ASSESSMENT</span>
             </div>
 
             {/* Main Editorial Title */}
-            <div className="space-y-1">
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white uppercase leading-[0.95]">
-                OPERATION
-                <span className="block text-slate-100">ZERO-DAY</span>
+            <div className="space-y-1.5">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white uppercase leading-[1.05]">
+                CYBER CELL
+                <span className="block text-slate-300">TECHNICAL RECRUITMENT</span>
               </h1>
-              <p className="text-base sm:text-lg font-medium text-slate-400 pt-2">
-                Technical Assessment Environment
+              <p className="text-sm sm:text-base font-medium text-slate-400 pt-1">
+                Standardized Evaluation • Problem Solving, Logic & Engineering Capability
               </p>
             </div>
 
             {/* Briefing Narrative */}
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">
-              A simulated incident-response environment designed to evaluate technical thinking, problem solving, and practical capability. Investigate live telemetry, diagnose threats, and demonstrate core technical aptitude.
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+              Welcome to the official technical evaluation for the Cyber Cell. This proctored platform measures your computational thinking, system awareness, problem-solving, and practical technical depth with zero bias.
             </p>
 
             {/* Primary & Secondary Call to Actions */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+            <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               
-              {/* Primary Action: Clean, high-contrast solid white */}
+              {/* Primary Action: Solid High-Contrast Button with Smooth Lift */}
               <button
                 onClick={startRecruitment}
-                className="h-12 px-7 rounded-lg bg-white hover:bg-slate-200 text-slate-950 font-bold text-sm tracking-wide transition-all duration-150 flex items-center justify-center gap-2.5 shadow-sm active:translate-y-0.5 cursor-pointer"
+                className="group relative h-12 px-7 rounded-lg bg-white hover:bg-slate-100 text-slate-950 font-bold text-sm tracking-wide transition-all duration-200 flex items-center justify-center gap-2.5 shadow-lg shadow-white/5 hover:shadow-white/10 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer overflow-hidden"
               >
-                <Terminal className="w-4 h-4 stroke-[2.5]" />
+                <Terminal className="w-4 h-4 stroke-[2.5] text-slate-950 transition-transform duration-200 group-hover:scale-110" />
                 <span>ENTER RECRUITMENT</span>
+                <ArrowRight className="w-4 h-4 stroke-[2.5] text-slate-950 transition-transform duration-200 group-hover:translate-x-1" />
               </button>
 
-              {/* Secondary Action: Minimalist dark button */}
+              {/* Secondary Action: Minimalist Practice Button */}
               <button
                 onClick={startDemo}
-                className="h-12 px-6 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/[0.1] hover:border-white/20 font-semibold text-sm transition-all duration-150 flex items-center justify-center gap-2.5 cursor-pointer"
+                className="h-12 px-6 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 hover:text-white border border-white/[0.1] hover:border-white/20 font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
               >
                 <Play className="w-3.5 h-3.5 fill-current text-sky-400" />
-                <span>PLAY DEMO</span>
+                <span>PRACTICE DEMO</span>
               </button>
             </div>
 
-            {/* Assessment Parameter Metadata Badges */}
-            <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-white/[0.08] w-full max-w-xl">
+            {/* 4 Essential Assessment Parameters */}
+            <div className="pt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 border-t border-white/[0.08] w-full max-w-xl">
               <div>
-                <span className="text-[11px] font-mono text-[#8DA3A0] uppercase block">
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block">
                   Duration
                 </span>
                 <span className="text-xs font-semibold text-white mt-0.5 block">
-                  30–50 Minutes
+                  30–45 Mins
                 </span>
               </div>
 
               <div>
-                <span className="text-[11px] font-mono text-[#8DA3A0] uppercase block">
-                  Assessment
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block">
+                  Questions
                 </span>
                 <span className="text-xs font-semibold text-white mt-0.5 block">
-                  Multi-Skill Profiling
+                  30 MCQs + Depth
                 </span>
               </div>
 
               <div>
-                <span className="text-[11px] font-mono text-[#8DA3A0] uppercase block">
-                  Policy
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block">
+                  Compatibility
                 </span>
                 <span className="text-xs font-semibold text-white mt-0.5 block">
-                  One Attempt
+                  Mobile & Desktop
                 </span>
               </div>
 
               <div>
-                <span className="text-[11px] font-mono text-[#8DA3A0] uppercase block">
-                  Environment
+                <span className="text-[10px] sm:text-[11px] font-mono text-slate-400 uppercase block">
+                  Eligibility
                 </span>
                 <span className="text-xs font-semibold text-white mt-0.5 block">
-                  Browser-Based
+                  All Semesters
                 </span>
               </div>
             </div>
 
           </div>
 
-          {/* RIGHT COLUMN: Realistic SOC Mission Panel & Pipeline (~42%) */}
-          <div className="lg:col-span-5 flex flex-col space-y-4">
+          {/* RIGHT COLUMN: Authentic Assessment Protocol Card */}
+          <div className="lg:col-span-5 flex flex-col space-y-3.5">
             
-            {/* Live Operational Status Card */}
-            <div className="p-6 rounded-xl bg-[#0F172A] border border-white/[0.08] shadow-sm relative overflow-hidden">
-              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+            <div className="p-5 sm:p-6 rounded-xl bg-[#0F172A] border border-white/[0.08] shadow-xl relative overflow-hidden transition-all duration-300 hover:border-white/[0.15]">
+              
+              <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="w-2 h-2 rounded-full bg-sky-400" />
                   <span className="text-xs font-mono font-bold uppercase text-white tracking-wider">
-                    MISSION STATUS
+                    EVALUATION PROTOCOL
                   </span>
                 </div>
-                <span className="text-[11px] font-mono text-slate-400">
-                  ROUND 01 • SOC SCREENING
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-medium">
+                  PROCTORED
                 </span>
               </div>
 
-              {/* Story / Mission Briefing */}
-              <div className="py-4 space-y-3">
-                <div className="text-xs text-slate-300 leading-relaxed">
-                  A simulated institutional network has reported anomalous telemetry and credential degradation. Your objective is to isolate unauthorized intrusions, correct defensive configurations, and record technical benchmarks.
-                </div>
+              {/* Guidelines List */}
+              <div className="py-3.5 space-y-2.5 text-xs">
                 
-                <div className="p-3 rounded-lg bg-[#080C14] border border-white/[0.06] text-xs text-slate-400 flex items-start gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                  <span>
-                    No prior cybersecurity specialization is required for the common assessment. Open to all technical streams and beginners.
-                  </span>
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white font-medium">Open to All Branches:</strong> No prior advanced security knowledge required. Foundational logic, aptitude, and problem solving are prioritized.
+                  </div>
                 </div>
+
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white font-medium">Integrity Monitored:</strong> Fullscreen mode, app switching, and tab switching are monitored with negative marking penalties for violations.
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <Monitor className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white font-medium">Headache-Free Mobile Test:</strong> On phones and tablets, questions open directly in clean sequential mode without 3D control friction.
+                  </div>
+                </div>
+
               </div>
 
-              {/* Functional Systems Telemetry Readout */}
-              <div className="pt-3 border-t border-white/[0.08] grid grid-cols-2 gap-3 text-xs font-mono">
-                <div className="p-2.5 rounded-lg bg-[#080C14] border border-white/[0.06]">
-                  <span className="text-[10px] text-slate-400 block">CAMPUS NETWORK</span>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-white font-bold">91%</span>
-                    <span className="text-[10px] text-emerald-400">STABLE</span>
+              {/* Sequential Stage Unlocking Status Card */}
+              <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-md bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-mono font-bold text-xs">
+                    01
                   </div>
-                  <div className="w-full bg-white/10 h-1 rounded-full mt-1.5 overflow-hidden">
-                    <div className="bg-emerald-400 h-full rounded-full" style={{ width: '91%' }} />
+                  <div>
+                    <div className="font-semibold text-white text-xs">Stage Progression</div>
+                    <div className="text-[11px] text-slate-400">
+                      {isR1Complete ? 'Stage 01 A Complete • Stage 01 B Unlocked' : 'Complete Stage 01 A to unlock Stage 01 B'}
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-lg bg-[#080C14] border border-white/[0.06]">
-                  <span className="text-[10px] text-slate-400 block">EVALUATION CORES</span>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-white font-bold">12 / 12</span>
-                    <span className="text-[10px] text-sky-400">ONLINE</span>
-                  </div>
-                  <div className="w-full bg-white/10 h-1 rounded-full mt-1.5 overflow-hidden">
-                    <div className="bg-sky-400 h-full rounded-full" style={{ width: '100%' }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sequential Stage Unlocking Status Card */}
-            <div className="p-4 rounded-xl bg-[#0F172A] border border-white/[0.08] flex items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 font-mono font-bold text-xs">
-                  01
-                </div>
-                <div>
-                  <div className="font-semibold text-white">Stage Progression</div>
-                  <div className="text-[11px] text-slate-400">
-                    {isR1Complete ? 'Round 01 A Complete • Round 01 B Unlocked' : 'Submit Round 01 A to unlock Round 01 B Profiling'}
-                  </div>
-                </div>
+                {!isR1Complete && (
+                  <button
+                    type="button"
+                    onClick={() => setRound1Submitted(true)}
+                    className="px-2 py-1 rounded bg-white/[0.05] hover:bg-white/[0.1] text-[11px] text-sky-400 font-mono border border-sky-500/30 hover:border-sky-400 transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                    title="Unlock Stage 01 B for testing"
+                  >
+                    <Unlock className="w-3 h-3" />
+                    <span>Unlock</span>
+                  </button>
+                )}
               </div>
 
-              {!isR1Complete && (
-                <button
-                  type="button"
-                  onClick={() => setRound1Submitted(true)}
-                  className="px-2.5 py-1 rounded-md bg-white/[0.05] hover:bg-white/[0.1] text-xs text-sky-400 font-mono border border-sky-500/30 hover:border-sky-400 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
-                  title="Mark Round 01 A complete for testing"
-                >
-                  <Unlock className="w-3 h-3" />
-                  <span>Unlock</span>
-                </button>
-              )}
             </div>
 
           </div>
@@ -293,122 +282,66 @@ export default function LandingPage() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 3. WHAT YOU'LL DO: 4-STEP PRODUCT PROCESS (Product Clarity)               */}
+        {/* 3. THE THREE ASSESSMENT STAGES (Clean 3-Card Grid)                        */}
         {/* ========================================================================= */}
-        <div className="mt-14 lg:mt-20 pt-10 border-t border-white/[0.08]">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6">
+        <div className="mt-10 sm:mt-14 pt-8 border-t border-white/[0.08]">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-5">
             <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-sky-400">
-                EVALUATION WORKFLOW
+              <span className="text-[11px] font-mono uppercase tracking-wider text-sky-400">
+                ASSESSMENT STAGES
               </span>
-              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight mt-0.5">
-                What You'll Do During The Assessment
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight mt-0.5">
+                Evaluation Workflow & Modules
               </h2>
             </div>
-            <span className="text-xs text-slate-400">
-              Objective, calibrated performance measurement
+            <span className="text-xs text-slate-400 hidden sm:inline">
+              Calibrated multi-tier technical assessment
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            <div className="p-4 rounded-xl bg-[#0F172A] border border-white/[0.06] hover:border-white/[0.15] transition-colors">
-              <div className="text-xs font-mono font-bold text-sky-400 mb-2">
-                01 &bull; INVESTIGATE
-              </div>
-              <h3 className="text-sm font-semibold text-white mb-1">
-                Explore The Cyber Room
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Navigate the 3D terminal stations and inspect live institutional telemetry to identify alerts.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-[#0F172A] border border-white/[0.06] hover:border-white/[0.15] transition-colors">
-              <div className="text-xs font-mono font-bold text-sky-400 mb-2">
-                02 &bull; SOLVE
-              </div>
-              <h3 className="text-sm font-semibold text-white mb-1">
-                Solve Technical Challenges
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Answer calibrated questions across programming, logic, networking, and system forensics.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-[#0F172A] border border-white/[0.06] hover:border-white/[0.15] transition-colors">
-              <div className="text-xs font-mono font-bold text-sky-400 mb-2">
-                03 &bull; DEMONSTRATE
-              </div>
-              <h3 className="text-sm font-semibold text-white mb-1">
-                Hands-On Profiling
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Declare your specific technical skills in Round 01 B and complete letter-slot and lab evaluations.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-[#0F172A] border border-white/[0.06] hover:border-white/[0.15] transition-colors">
-              <div className="text-xs font-mono font-bold text-sky-400 mb-2">
-                04 &bull; BENCHMARK
-              </div>
-              <h3 className="text-sm font-semibold text-white mb-1">
-                Receive Performance Dossier
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Generate an automated candidate diagnostic profiling your verified strengths and competencies.
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* 4. THREE OPERATIONAL ASSESSMENT TRACKS (Clean Enterprise Cards)           */}
-        {/* ========================================================================= */}
-        <div className="mt-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
-            {/* Card 1: Round 01 A */}
+            {/* Card 1: Stage 01 A */}
             <div 
               onClick={startDemo}
-              className="p-6 rounded-xl bg-[#0F172A] border border-white/[0.08] hover:border-white/20 cursor-pointer transition-all duration-150 group flex flex-col justify-between"
+              className="p-5 rounded-xl bg-[#0F172A] border border-white/[0.08] hover:border-sky-500/40 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-xl group flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-mono font-semibold text-sky-400 uppercase px-2 py-0.5 rounded-md bg-sky-500/10 border border-sky-500/20">
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className="text-[10px] font-mono font-semibold text-sky-400 uppercase px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20">
                     STAGE 01 A • SCREENING
                   </span>
                   <span className="text-[10px] font-mono text-emerald-400 font-semibold">
                     AVAILABLE
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-white group-hover:text-sky-300 transition-colors">
-                  Common SOC Assessment
+                <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-sky-300 transition-colors">
+                  Common Technical Screening
                 </h3>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                  Foundational screening inside the 3D Cyber Room: 30 calibrated questions & puzzles across technical logic, networking, and security.
+                  30 calibrated questions across 8 domains: Logical Thinking, CS Fundamentals, Web Basics, Security Concepts, and Incident Triage.
                 </p>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium text-slate-300 group-hover:text-white">
-                <span>Launch Assessment</span>
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium text-slate-300 group-hover:text-white">
+                <span>Start Screening</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
-            {/* Card 2: Round 01 B */}
+            {/* Card 2: Stage 01 B */}
             <div 
               onClick={() => navigate('/technical-profile')}
-              className={`p-6 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+              className={`p-5 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                 isR1Complete
-                  ? 'bg-[#0F172A] border-white/[0.08] hover:border-white/20 group'
-                  : 'bg-[#0F172A]/50 border-white/[0.05] opacity-80 hover:opacity-100'
+                  ? 'bg-[#0F172A] border-white/[0.08] hover:border-indigo-500/40 hover:-translate-y-1 hover:shadow-xl group'
+                  : 'bg-[#0F172A]/50 border-white/[0.05] opacity-75 hover:opacity-100'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-md border ${
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className={`text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded border ${
                     isR1Complete 
                       ? 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' 
                       : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
@@ -421,27 +354,25 @@ export default function LandingPage() {
                     <Lock className="w-3.5 h-3.5 text-amber-400" />
                   )}
                 </div>
-                <h3 className={`text-base font-bold transition-colors ${
+                <h3 className={`text-sm sm:text-base font-bold transition-colors ${
                   isR1Complete ? 'text-white group-hover:text-indigo-300' : 'text-slate-300'
                 }`}>
                   Technical Skill Profiling
                 </h3>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                  {isR1Complete 
-                    ? 'Personalized technical depth: Declare your specific skills, answer fill-in-the-blank letter slots, and run practical labs.'
-                    : 'Prerequisite required: Submit Round 01 A first to generate your baseline and unlock personalized profiling.'}
+                  Personalized technical depth: Choose your domain (Web, Python, DSA, Security, Cloud) and complete targeted letter-slot and code challenges.
                 </p>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
                 {isR1Complete ? (
                   <>
-                    <span className="text-slate-300 group-hover:text-white">Enter Skill Profiling</span>
+                    <span className="text-slate-300 group-hover:text-white">Enter Profiling</span>
                     <ChevronRight className="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" />
                   </>
                 ) : (
                   <>
-                    <span className="text-amber-400/90 text-[11px]">Requires Round 01 A</span>
+                    <span className="text-amber-400/90 text-[11px]">Requires Stage 01 A</span>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -457,49 +388,49 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Card 3: Stage 01 C - Hands-On Simulation Labs (Optional Bonus) */}
+            {/* Card 3: Stage 01 C - Optional Bonus Labs */}
             <div 
               onClick={() => navigate('/arcade')}
-              className={`p-6 rounded-xl border transition-all duration-150 cursor-pointer flex flex-col justify-between ${
+              className={`p-5 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                 isR1Complete
-                  ? 'bg-[#0F172A] border-white/[0.08] hover:border-white/20 group'
-                  : 'bg-[#0F172A]/50 border-white/[0.05] opacity-80 hover:opacity-100'
+                  ? 'bg-[#0F172A] border-white/[0.08] hover:border-amber-400/40 hover:-translate-y-1 hover:shadow-xl group'
+                  : 'bg-[#0F172A]/50 border-white/[0.05] opacity-75 hover:opacity-100'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded-md border ${
+                <div className="flex items-center justify-between mb-2.5">
+                  <span className={`text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded border ${
                     isR1Complete 
                       ? 'text-amber-400 bg-amber-400/10 border-amber-400/30' 
                       : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
                   }`}>
-                    STAGE 01 C • {isR1Complete ? 'OPTIONAL BONUS' : 'LOCKED'}
+                    STAGE 01 C • OPTIONAL BONUS
                   </span>
                   {isR1Complete ? (
-                    <span className="text-[10px] font-mono text-amber-400 font-semibold">+BONUS POINTS</span>
+                    <span className="text-[10px] font-mono text-amber-400 font-semibold">+BONUS</span>
                   ) : (
                     <Lock className="w-3.5 h-3.5 text-amber-400" />
                   )}
                 </div>
-                <h3 className={`text-base font-bold transition-colors ${
+                <h3 className={`text-sm sm:text-base font-bold transition-colors ${
                   isR1Complete ? 'text-white group-hover:text-amber-300' : 'text-slate-300'
                 }`}>
-                  Simulation Labs (Optional)
+                  Simulation Labs (Bonus)
                 </h3>
                 <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                  Optional hands-on diagnostic labs to earn extra bonus points: 10 interactive simulations including Network Topology, Intrusion Log Inspection, Password Entropy, and Linux Shell Forensics.
+                  Earn extra credit with 10 hands-on interactive simulations including Network Topology, Intrusion Log Inspection, and Linux Shell Forensics.
                 </p>
               </div>
 
-              <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
                 {isR1Complete ? (
                   <>
-                    <span className="text-amber-400 font-medium">Launch Stage 01 C Labs</span>
+                    <span className="text-amber-400 font-medium">Launch Labs</span>
                     <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
                   </>
                 ) : (
                   <>
-                    <span className="text-amber-400/90 text-[11px]">Requires Round 01 A</span>
+                    <span className="text-amber-400/90 text-[11px]">Requires Stage 01 A</span>
                     <button
                       type="button"
                       onClick={(e) => {
@@ -521,27 +452,20 @@ export default function LandingPage() {
       </main>
 
       {/* ========================================================================= */}
-      {/* 5. PROFESSIONAL FOOTER                                                    */}
+      {/* 4. PROFESSIONAL PRODUCT FOOTER                                            */}
       {/* ========================================================================= */}
       <footer className="relative z-20 border-t border-white/[0.08] bg-[#060911]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#8DA3A0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           
           {/* Left: Organization Credibility */}
-          <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 text-center sm:text-left">
             <span className="font-semibold text-white">Cyber Cell</span>
             <span className="hidden sm:inline text-white/20">&bull;</span>
-            <span>Samrat Ashok Technological Institute, Vidisha (M.P.)</span>
+            <span className="text-[11px] sm:text-xs">Samrat Ashok Technological Institute, Vidisha (M.P.)</span>
           </div>
 
-          {/* Center: Helpful Modal Links */}
-          <div className="flex items-center gap-5">
-            <button 
-              onClick={() => setActiveModal('controls')}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Controls Guide
-            </button>
-            <span className="text-white/20">&bull;</span>
+          {/* Center: Guidelines & Requirements Modal Triggers */}
+          <div className="flex items-center gap-4 text-[11px] sm:text-xs">
             <button 
               onClick={() => setActiveModal('howItWorks')}
               className="hover:text-white transition-colors cursor-pointer"
@@ -557,15 +481,15 @@ export default function LandingPage() {
             </button>
           </div>
 
-          {/* Right: Technical Version & Discreet Admin Access */}
-          <div className="flex items-center gap-3">
-            <span className="font-mono text-[11px] text-[#8DA3A0]">
-              Operation Zero-Day v1.0
+          {/* Right: Technical Version & Admin Access */}
+          <div className="flex items-center gap-3 text-[11px]">
+            <span className="font-mono text-slate-500">
+              Recruitment v2026
             </span>
             <span className="text-white/20">&bull;</span>
             <button
               onClick={() => navigate('/admin')}
-              className="text-[#8DA3A0] hover:text-[#00FFCC] transition-colors cursor-pointer font-medium text-[11px]"
+              className="text-slate-400 hover:text-sky-400 transition-colors cursor-pointer font-medium"
               title="Recruiter & Evaluation Administration"
             >
               Admin Access
@@ -576,70 +500,40 @@ export default function LandingPage() {
       </footer>
 
       {/* ========================================================================= */}
-      {/* 6. MODALS: CLEAN PRODUCT DIALOGS                                          */}
+      {/* 5. MODALS: CLEAN PRODUCT DIALOGS                                          */}
       {/* ========================================================================= */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="w-full max-w-lg bg-[#0A0F1D] border border-white/[0.12] rounded-lg p-6 text-[#EAF7F5] relative shadow-2xl">
+          <div className="w-full max-w-lg bg-[#0A0F1D] border border-white/[0.12] rounded-xl p-6 text-slate-200 relative shadow-2xl animate-scaleIn">
             
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 p-1 rounded-md text-[#8DA3A0] hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
+              className="absolute top-4 right-4 p-1 rounded-md text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {activeModal === 'controls' && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 pb-2 border-b border-white/[0.08]">
-                  <Sliders className="w-5 h-5 text-[#00FFCC]" />
-                  <h3 className="text-base font-bold text-white">
-                    Candidate Navigation & Controls
-                  </h3>
-                </div>
-
-                <div className="space-y-2 text-xs">
-                  <div className="p-3 rounded bg-[#060911] border border-white/[0.06] flex justify-between items-center">
-                    <span className="font-mono font-bold text-white">W / A / S / D</span>
-                    <span className="text-[#8DA3A0]">Walk forward, left, backward, right</span>
-                  </div>
-                  <div className="p-3 rounded bg-[#060911] border border-white/[0.06] flex justify-between items-center">
-                    <span className="font-mono font-bold text-white">MOUSE MOVEMENT</span>
-                    <span className="text-[#8DA3A0]">Look around 360° (first-person view)</span>
-                  </div>
-                  <div className="p-3 rounded bg-[#060911] border border-white/[0.06] flex justify-between items-center">
-                    <span className="font-mono font-bold text-white">[E] KEY OR CLICK</span>
-                    <span className="text-[#8DA3A0]">Interact with active terminal console</span>
-                  </div>
-                  <div className="p-3 rounded bg-[#060911] border border-white/[0.06] flex justify-between items-center">
-                    <span className="font-mono font-bold text-white">ESC</span>
-                    <span className="text-[#8DA3A0]">Release mouse cursor lock</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {activeModal === 'howItWorks' && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 pb-2 border-b border-white/[0.08]">
-                  <HelpCircle className="w-5 h-5 text-[#00FFCC]" />
+                  <HelpCircle className="w-5 h-5 text-sky-400" />
                   <h3 className="text-base font-bold text-white">
                     Recruitment Assessment Structure
                   </h3>
                 </div>
 
-                <div className="space-y-3 text-xs text-[#BAC8C5] leading-relaxed">
+                <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
                   <p>
-                    <strong className="text-white">1. Stage 01 A (Common Screening):</strong> All candidates complete a 3D simulated incident environment featuring 30 questions across logic, networking, and computing concepts.
+                    <strong className="text-white">1. Stage 01 A (Common Screening):</strong> 30 calibrated questions across logical reasoning, computer science fundamentals, web concepts, and security scenarios.
                   </p>
                   <p>
-                    <strong className="text-white">2. Stage 01 B (Skill Profiling):</strong> Candidates declare their technical skills (Web, Python, DSA, Security, Cloud, etc.) and complete calibrated knowledge, letter-slot, and lab challenges.
+                    <strong className="text-white">2. Stage 01 B (Skill Profiling):</strong> Candidates declare their technical skills (Web, Python, DSA, Security, Cloud, etc.) and complete targeted fill-in-the-blank slots and questions.
                   </p>
                   <p>
-                    <strong className="text-white">3. Integrity & Proctoring:</strong> Continuous fullscreen mode is strictly required. Unsanctioned tab switching or window minimization triggers negative marking.
+                    <strong className="text-white">3. Stage 01 C (Bonus Labs):</strong> Optional hands-on simulations for candidates wishing to demonstrate practical depth and earn bonus credit.
                   </p>
                   <p>
-                    <strong className="text-white">4. Objective Evaluation:</strong> Submissions are automatically scored against technical criteria to form a transparent diagnostic dossier.
+                    <strong className="text-white">4. Integrity & Proctoring:</strong> Continuous fullscreen and webcam presence are monitored. Unsanctioned app or tab switching will skip the active question with negative marking.
                   </p>
                 </div>
               </div>
@@ -648,24 +542,24 @@ export default function LandingPage() {
             {activeModal === 'requirements' && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 pb-2 border-b border-white/[0.08]">
-                  <Monitor className="w-5 h-5 text-[#00FFCC]" />
+                  <Monitor className="w-5 h-5 text-sky-400" />
                   <h3 className="text-base font-bold text-white">
-                    Hardware & Browser Requirements
+                    Hardware & System Requirements
                   </h3>
                 </div>
 
-                <div className="space-y-2.5 text-xs text-[#BAC8C5]">
-                  <div className="p-2.5 rounded bg-[#060911] border border-white/[0.06]">
-                    <span className="font-semibold text-white block">Operating Browser</span>
-                    <span className="text-[#8DA3A0]">Modern Google Chrome, Microsoft Edge, or Firefox on Desktop/Laptop.</span>
+                <div className="space-y-2.5 text-xs text-slate-300">
+                  <div className="p-2.5 rounded-lg bg-[#060911] border border-white/[0.06]">
+                    <span className="font-semibold text-white block">Device Compatibility</span>
+                    <span className="text-slate-400">Supported on all modern smartphones, laptops, and desktop computers.</span>
                   </div>
-                  <div className="p-2.5 rounded bg-[#060911] border border-white/[0.06]">
-                    <span className="font-semibold text-white block">Webcam Access</span>
-                    <span className="text-[#8DA3A0]">Functional camera for live proctoring verification during recruitment mode.</span>
+                  <div className="p-2.5 rounded-lg bg-[#060911] border border-white/[0.06]">
+                    <span className="font-semibold text-white block">Browser</span>
+                    <span className="text-slate-400">Google Chrome, Microsoft Edge, Safari, or Firefox.</span>
                   </div>
-                  <div className="p-2.5 rounded bg-[#060911] border border-white/[0.06]">
-                    <span className="font-semibold text-white block">Display Standard</span>
-                    <span className="text-[#8DA3A0]">Continuous fullscreen mode is enforced throughout all assessment rounds.</span>
+                  <div className="p-2.5 rounded-lg bg-[#060911] border border-white/[0.06]">
+                    <span className="font-semibold text-white block">Camera Permission</span>
+                    <span className="text-slate-400">Webcam access required during recruitment mode for continuous proctoring.</span>
                   </div>
                 </div>
               </div>
@@ -673,7 +567,7 @@ export default function LandingPage() {
 
             <button
               onClick={() => setActiveModal(null)}
-              className="mt-6 w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] text-white text-xs font-semibold rounded-md transition-colors cursor-pointer"
+              className="mt-6 w-full py-2.5 bg-white text-slate-950 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer hover:bg-slate-200"
             >
               Close
             </button>
