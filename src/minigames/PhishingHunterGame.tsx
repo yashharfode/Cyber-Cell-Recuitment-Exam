@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, ShieldCheck, ShieldAlert, CheckCircle2, AlertOctagon } from 'lucide-react';
+import { Mail, ShieldCheck, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 export interface PhishingEmail {
   id: string;
@@ -64,45 +64,23 @@ export default function PhishingHunterGame({ config, onSolve, disabled }: Phishi
 
   // Track status for each email: 'SAFE' | 'SUSPICIOUS' | null
   const [triageStatus, setTriageStatus] = useState<Record<string, 'SAFE' | 'SUSPICIOUS'>>({});
-  const [selectedClues, setSelectedClues] = useState<string[]>([]);
   const [isEvaluated, setIsEvaluated] = useState<boolean>(false);
-
-  const phishingTarget = emails.find(e => e.isPhishing) || emails[1];
 
   const handleTriage = (emailId: string, status: 'SAFE' | 'SUSPICIOUS') => {
     if (disabled || isEvaluated) return;
-    const updated = { ...triageStatus, [emailId]: status };
-    setTriageStatus(updated);
-
-    // If all emails triaged, and clues selected
-    checkEvaluation(updated, selectedClues);
+    setTriageStatus(prev => ({ ...prev, [emailId]: status }));
   };
 
-  const handleToggleClue = (clueId: string) => {
+  const handleConfirmTriage = () => {
     if (disabled || isEvaluated) return;
-    const updated = selectedClues.includes(clueId)
-      ? selectedClues.filter(c => c !== clueId)
-      : [...selectedClues, clueId];
-    setSelectedClues(updated);
-    checkEvaluation(triageStatus, updated);
-  };
+    const allCorrect = emails.every(e => {
+      const expected = e.isPhishing ? 'SUSPICIOUS' : 'SAFE';
+      return triageStatus[e.id] === expected;
+    });
 
-  const checkEvaluation = (triage: Record<string, 'SAFE' | 'SUSPICIOUS'>, clues: string[]) => {
-    const allTriaged = emails.every(e => !!triage[e.id]);
-    const requiredClueCount = phishingTarget.redFlags?.length || 3;
-
-    if (allTriaged && clues.length >= requiredClueCount) {
-      const triageCorrect = emails.every(e => {
-        const expected = e.isPhishing ? 'SUSPICIOUS' : 'SAFE';
-        return triage[e.id] === expected;
-      });
-      const allCluesPicked = phishingTarget.redFlags?.every(f => clues.includes(f.id)) ?? false;
-      const pass = triageCorrect && allCluesPicked;
-
-      setIsEvaluated(true);
-      if (onSolve) {
-        onSolve({ triage, clues }, pass);
-      }
+    setIsEvaluated(true);
+    if (onSolve) {
+      onSolve(triageStatus, allCorrect);
     }
   };
 
@@ -116,7 +94,7 @@ export default function PhishingHunterGame({ config, onSolve, disabled }: Phishi
           </span>
           <h3 className="text-base font-bold text-white mt-1">INSPECT INCOMING EMAILS & FLAG DECEPTION</h3>
           <p className="text-xs text-cyber-muted mt-0.5">
-            1. Categorize each email as SAFE or SUSPICIOUS. 2. Click all 3 deception indicators on the malicious email.
+            Analyze each message carefully. Categorize each email as SAFE or SUSPICIOUS based on sender domain, urgency, and content.
           </p>
         </div>
       </div>
@@ -143,9 +121,7 @@ export default function PhishingHunterGame({ config, onSolve, disabled }: Phishi
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-white">{email.senderName}</span>
-                    <span className={`text-[11px] font-mono px-1.5 py-0.2 rounded border ${
-                      email.isPhishing ? 'bg-amber-400/10 text-amber-300 border-amber-400/30' : 'bg-white/5 text-cyber-muted border-white/10'
-                    }`}>
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded border bg-white/5 text-cyber-muted border-white/10">
                       &lt;{email.senderEmail}&gt;
                     </span>
                   </div>
@@ -185,57 +161,38 @@ export default function PhishingHunterGame({ config, onSolve, disabled }: Phishi
         })}
       </div>
 
-      {/* Clue Hunter Section for Suspicious Email */}
-      <div className="mt-5 p-4 rounded-lg bg-[#05080F] border border-cyber-danger/30">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <AlertOctagon className="w-4 h-4 text-cyber-danger" />
-            <span className="text-xs font-bold text-white uppercase">
-              Identify the Deception Artifacts (Select all 3 red flags)
-            </span>
-          </div>
-          <span className="text-[11px] text-cyber-muted">
-            {selectedClues.length} of {phishingTarget.redFlags?.length || 3} identified
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {phishingTarget.redFlags?.map((flag) => {
-            const isSelected = selectedClues.includes(flag.id);
-
-            return (
-              <button
-                key={flag.id}
-                onClick={() => handleToggleClue(flag.id)}
-                disabled={disabled || isEvaluated}
-                className={`p-3 rounded border text-left transition-all ${
-                  isSelected
-                    ? 'border-cyber-danger bg-red-950/40 text-white ring-1 ring-cyber-danger'
-                    : 'border-cyber-border bg-[#0D131F] text-slate-300 hover:border-cyber-danger/40'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] uppercase font-bold text-red-400">RED FLAG INDICATOR</span>
-                  {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-cyber-danger" />}
-                </div>
-                <h5 className="text-xs font-bold text-white">{flag.label}</h5>
-                <p className="text-[10px] text-cyber-muted mt-1 leading-snug">{flag.description}</p>
-              </button>
-            );
-          })}
-        </div>
+      {/* Triage Confirmation Footer */}
+      <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <span className="text-xs text-cyber-muted">
+          {Object.keys(triageStatus).length} of {emails.length} emails categorized
+        </span>
+        <button
+          onClick={handleConfirmTriage}
+          disabled={disabled || isEvaluated || Object.keys(triageStatus).length < emails.length}
+          className="w-full sm:w-auto px-5 py-2.5 bg-cyber-primary hover:bg-cyber-primary/90 text-black font-bold text-xs uppercase tracking-wider rounded disabled:opacity-30 disabled:pointer-events-none transition-all shadow-[0_0_15px_rgba(0,255,204,0.2)]"
+        >
+          {isEvaluated ? 'Decision Evaluated' : 'Confirm Email Triage'}
+        </button>
       </div>
 
       {/* Outcome Banner */}
       {isEvaluated && (
-        <div className="mt-4 p-3 rounded bg-cyber-success/20 border border-cyber-success/40 text-cyber-success text-xs flex items-center justify-between">
+        <div className={`mt-4 p-3 rounded border text-xs flex items-center justify-between ${
+          emails.every(e => (e.isPhishing ? 'SUSPICIOUS' : 'SAFE') === triageStatus[e.id])
+            ? 'bg-cyber-success/20 border-cyber-success/40 text-cyber-success'
+            : 'bg-red-950/20 border-red-500/30 text-red-400'
+        }`}>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
             <span className="font-bold">
-              PHISHING DEFENSE VALIDATED: Deception vector neutralized and clues verified!
+              {emails.every(e => (e.isPhishing ? 'SUSPICIOUS' : 'SAFE') === triageStatus[e.id])
+                ? 'PHISHING DEFENSE VALIDATED: Deception vector successfully neutralized!'
+                : 'ANALYSIS FLAW: One or more emails were misclassified.'}
             </span>
           </div>
-          <span className="font-bold tracking-widest text-[11px] uppercase">+100 XP</span>
+          {emails.every(e => (e.isPhishing ? 'SUSPICIOUS' : 'SAFE') === triageStatus[e.id]) && (
+            <span className="font-bold tracking-widest text-[11px] uppercase">+100 XP</span>
+          )}
         </div>
       )}
     </div>

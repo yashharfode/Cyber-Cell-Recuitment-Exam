@@ -43,7 +43,7 @@ export default function VisualCaseViewer({ visualCase }: VisualCaseViewerProps) 
             <div className="text-cyber-muted">
               <span className="text-cyber-text font-semibold">From: </span>
               <span className="text-white">{data.senderName} </span>
-              <span className="text-cyber-warning bg-cyber-warning/10 px-1.5 py-0.5 rounded border border-cyber-warning/30 text-[11px]">
+              <span className="text-cyber-muted bg-white/5 px-1.5 py-0.5 rounded border border-white/10 text-[11px]">
                 &lt;{data.senderEmail}&gt;
               </span>
             </div>
