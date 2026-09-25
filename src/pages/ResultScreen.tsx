@@ -8,7 +8,8 @@ import {
   CheckCircle2, 
   Home, 
   BarChart3,
-  Activity
+  Activity,
+  Sparkles
 } from 'lucide-react';
 
 export default function ResultScreen() {
@@ -176,9 +177,10 @@ export default function ResultScreen() {
           <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
             <button
               onClick={() => navigate('/arcade')}
-              className="w-full sm:w-auto px-4 py-2.5 bg-white/5 hover:bg-white/10 text-amber-400 border border-amber-400/40 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
             >
-              PLAY ARCADE LAB
+              <Sparkles className="w-3.5 h-3.5" />
+              STAGE 01 C: BONUS LABS (OPTIONAL)
             </button>
             <button
               onClick={handleReturn}

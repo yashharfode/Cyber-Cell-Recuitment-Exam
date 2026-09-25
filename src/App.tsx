@@ -24,8 +24,8 @@ function App() {
           path="/arcade" 
           element={
             <RoundLockGuard 
-              roundName="CYBER ARCADE & PRACTICE LAB"
-              roundDescription="The Cyber Arcade unlocks as a tactical sandbox reward once you complete and submit Round 01."
+              roundName="STAGE 01 C: SIMULATION LABS (OPTIONAL BONUS)"
+              roundDescription="Stage 01 C provides 10 optional hands-on interactive simulations. Complete them to earn bonus points towards your final recruitment ranking."
             >
               <CyberArcade />
             </RoundLockGuard>

@@ -144,7 +144,14 @@ export default function CyberArcade() {
   const navigate = useNavigate();
   const [selectedGameId, setSelectedGameId] = useState<string>('game-terminal');
   const [viewMode, setViewMode] = useState<'games' | 'tree'>('games');
-  const [completedGames, setCompletedGames] = useState<Record<string, number>>({});
+  const [completedGames, setCompletedGames] = useState<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('cyber_arcade_completed');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [isFullscreen, setIsFullscreen] = useState<boolean>(isBrowserFullscreen());
   const [showWarningModal, setShowWarningModal] = useState<boolean>(false);
 
@@ -190,10 +197,20 @@ export default function CyberArcade() {
 
   const handleGameSolved = (gameId: string, pts: number, isCorrect: boolean) => {
     if (isCorrect) {
-      setCompletedGames(prev => ({
-        ...prev,
-        [gameId]: pts
-      }));
+      setCompletedGames(prev => {
+        const updated = {
+          ...prev,
+          [gameId]: pts
+        };
+        try {
+          localStorage.setItem('cyber_arcade_completed', JSON.stringify(updated));
+          const totalBonus = Object.values(updated).reduce((a, b) => a + b, 0);
+          localStorage.setItem('candidate_bonus_score', String(totalBonus));
+        } catch {
+          // ignore storage error
+        }
+        return updated;
+      });
     }
   };
 
@@ -213,13 +230,13 @@ export default function CyberArcade() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] tracking-widest text-cyber-primary uppercase font-bold px-2 py-0.5 bg-cyber-primary/10 border border-cyber-primary/30 rounded">
-                SIMULATION LAB
+              <span className="text-[10px] tracking-widest text-amber-400 uppercase font-bold px-2 py-0.5 bg-amber-400/10 border border-amber-400/30 rounded">
+                STAGE 01 C • OPTIONAL BONUS
               </span>
               <span className="text-xs text-cyber-muted hidden sm:inline">• OPERATION ZERO-DAY</span>
             </div>
             <h1 className="text-base md:text-lg font-bold text-white uppercase tracking-tight">
-              CYBER ARCADE: HANDS-ON CHALLENGES
+              HANDS-ON SIMULATION LABS (BONUS CREDITS)
             </h1>
           </div>
         </div>
@@ -242,10 +259,10 @@ export default function CyberArcade() {
             </button>
           )}
 
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded bg-black/40 border border-cyber-border text-xs">
-            <Award className="w-4 h-4 text-cyber-secondary" />
-            <span className="text-cyber-muted">Lab Points:</span>
-            <span className="font-bold text-cyber-secondary">{totalScoreEarned} XP</span>
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded bg-black/40 border border-amber-400/30 text-xs">
+            <Award className="w-4 h-4 text-amber-400" />
+            <span className="text-cyber-muted">Bonus Earned:</span>
+            <span className="font-bold text-amber-400">+{totalScoreEarned} BONUS XP</span>
           </div>
 
           <div className="flex rounded border border-cyber-border overflow-hidden">
@@ -275,6 +292,29 @@ export default function CyberArcade() {
 
       {/* Main Body */}
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+        {/* Stage 01 C Optional Bonus Notice Banner */}
+        <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2 rounded bg-amber-500/20 text-amber-400 shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                <span>Stage 01 C: Simulation Labs</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">OPTIONAL • BONUS CREDITS</span>
+              </div>
+              <p className="text-cyber-muted mt-0.5 leading-relaxed">
+                Stage 01 C is completely optional. Each mastered simulation awards bonus points credited directly to your final recruitment profile.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11px] text-amber-400 font-bold px-3 py-1 bg-black/40 border border-amber-400/30 rounded">
+              +{totalScoreEarned} / 1,220 BONUS PTS
+            </span>
+          </div>
+        </div>
+
         {viewMode === 'tree' ? (
           <div className="space-y-6">
             <SkillUnlockTree />

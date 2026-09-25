@@ -458,7 +458,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Card 3: Cyber Arcade */}
+            {/* Card 3: Stage 01 C - Hands-On Simulation Labs (Optional Bonus) */}
             <div 
               onClick={() => navigate('/arcade')}
               className={`p-5 rounded-lg border transition-all duration-150 cursor-pointer flex flex-col justify-between ${
@@ -474,10 +474,10 @@ export default function LandingPage() {
                       ? 'text-amber-400 bg-amber-400/10 border-amber-400/30' 
                       : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
                   }`}>
-                    LAB • {isR1Complete ? 'PRACTICE READY' : 'LOCKED'}
+                    STAGE 01 C • {isR1Complete ? 'OPTIONAL BONUS' : 'LOCKED'}
                   </span>
                   {isR1Complete ? (
-                    <span className="text-[10px] font-mono text-amber-400 font-semibold">10 PUZZLES</span>
+                    <span className="text-[10px] font-mono text-amber-400 font-semibold">+BONUS POINTS</span>
                   ) : (
                     <Lock className="w-3.5 h-3.5 text-amber-400" />
                   )}
@@ -485,17 +485,17 @@ export default function LandingPage() {
                 <h3 className={`text-base font-bold transition-colors ${
                   isR1Complete ? 'text-white group-hover:text-amber-400' : 'text-slate-300'
                 }`}>
-                  Simulation Lab & Skill Tree
+                  Simulation Labs (Optional)
                 </h3>
                 <p className="text-xs text-[#8DA3A0] mt-1.5 leading-relaxed">
-                  10 interactive simulations including Network Topology, Intrusion Log Inspection, Password Entropy, and Linux Shell Forensics.
+                  Optional hands-on diagnostic labs to earn extra bonus points: 10 interactive simulations including Network Topology, Intrusion Log Inspection, Password Entropy, and Linux Shell Forensics.
                 </p>
               </div>
 
               <div className="mt-5 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-medium">
                 {isR1Complete ? (
                   <>
-                    <span className="text-amber-400">Open Simulation Lab</span>
+                    <span className="text-amber-400 font-bold">Launch Stage 01 C Labs</span>
                     <ChevronRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
                   </>
                 ) : (

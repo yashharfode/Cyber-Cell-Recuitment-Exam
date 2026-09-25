@@ -221,13 +221,23 @@ export default function TechnicalResult() {
             <span>Re-configure Skills (Practice)</span>
           </button>
 
-          <button
-            onClick={() => navigate('/result')}
-            className="w-full sm:w-auto px-8 py-3.5 bg-cyber-primary hover:bg-white text-black font-bold text-xs uppercase tracking-wider rounded transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span>VIEW COMPLETE RECRUITMENT DOSSIER</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => navigate('/arcade')}
+              className="w-full sm:w-auto px-5 py-3.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>STAGE 01 C: BONUS LABS (OPTIONAL)</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/result')}
+              className="w-full sm:w-auto px-8 py-3.5 bg-cyber-primary hover:bg-white text-black font-bold text-xs uppercase tracking-wider rounded transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>VIEW DOSSIER</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
       </div>

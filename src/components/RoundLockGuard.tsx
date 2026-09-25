@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { Lock, Unlock, ShieldAlert, Home, Terminal } from 'lucide-react';
+import { Lock, Unlock, ShieldAlert, Home, Terminal, Sparkles } from 'lucide-react';
 
 interface RoundLockGuardProps {
   children: React.ReactNode;
@@ -70,14 +70,20 @@ export default function RoundLockGuard({
               <ShieldAlert className="w-3.5 h-3.5" /> PENDING SUBMISSION
             </span>
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pb-2 border-b border-white/5">
             <span className="text-cyber-muted uppercase text-[10px]">Round 01 B Status:</span>
             <span className="text-cyber-muted font-bold uppercase tracking-wider flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" /> LOCKED
             </span>
           </div>
+          <div className="flex items-center justify-between">
+            <span className="text-cyber-muted uppercase text-[10px]">Stage 01 C (Bonus Labs):</span>
+            <span className="text-amber-400/90 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> OPTIONAL BONUS
+            </span>
+          </div>
           <p className="text-[11px] text-cyber-muted pt-1">
-            * Once you complete the 30 SOC screening questions and review your debrief, Round 01 B will automatically unlock.
+            * Once you complete the 30 SOC screening questions and review your debrief, Round 01 B and Stage 01 C will automatically unlock.
           </p>
         </div>
 
