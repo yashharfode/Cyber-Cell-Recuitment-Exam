@@ -389,12 +389,24 @@ export default function Round2Assessment() {
       }
     };
 
+    const handlePreventCopy = (e: Event) => {
+      e.preventDefault();
+    };
+
     document.addEventListener('visibilitychange', handleTabSwitch);
     window.addEventListener('blur', handleTabSwitch);
+    window.addEventListener('pagehide', handleTabSwitch);
+    document.addEventListener('copy', handlePreventCopy);
+    document.addEventListener('cut', handlePreventCopy);
+    document.addEventListener('contextmenu', handlePreventCopy);
 
     return () => {
       document.removeEventListener('visibilitychange', handleTabSwitch);
       window.removeEventListener('blur', handleTabSwitch);
+      window.removeEventListener('pagehide', handleTabSwitch);
+      document.removeEventListener('copy', handlePreventCopy);
+      document.removeEventListener('cut', handlePreventCopy);
+      document.removeEventListener('contextmenu', handlePreventCopy);
     };
   }, [submissions]);
 
@@ -561,7 +573,7 @@ export default function Round2Assessment() {
         {/* Right HUD Controls: Webcam + Fullscreen + Timer */}
         <div className="flex items-center gap-3">
           {/* Proctoring Webcam Mini-Pip */}
-          <div className="relative w-14 h-10 bg-black border border-cyber-border rounded overflow-hidden hidden sm:block">
+          <div className="relative w-12 h-9 sm:w-14 sm:h-10 bg-black border border-cyber-border rounded overflow-hidden shrink-0">
             <video
               ref={proctorVideoRef}
               autoPlay

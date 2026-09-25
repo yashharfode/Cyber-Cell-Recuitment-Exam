@@ -314,7 +314,7 @@ export default function PreCheck() {
               <div className="p-4 rounded-lg bg-[#060911] border border-white/[0.06] flex flex-col md:flex-row items-center gap-5">
                 
                 {/* Visual Viewport */}
-                <div className="w-56 h-40 bg-black rounded-md border border-white/[0.1] relative overflow-hidden shrink-0 shadow-sm">
+                <div className="w-full max-w-[260px] h-44 sm:w-56 sm:h-40 bg-black rounded-md border border-white/[0.1] relative overflow-hidden shrink-0 shadow-sm mx-auto md:mx-0">
                   {/* Mirrored Live Video Feed */}
                   <video 
                     ref={videoRef} 

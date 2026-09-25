@@ -137,7 +137,7 @@ export default function FillInBlankModal({
     <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[85vh] shadow-2xl rounded-xl animate-scaleIn font-sans overflow-hidden my-auto">
       
       {/* Header - Fixed */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18] shrink-0">
+      <div className="flex items-center justify-between border-b border-white/[0.08] px-4 sm:px-6 py-3 sm:py-4 bg-[#090D18] shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg shrink-0">
             <Code2 className="w-5 h-5 text-sky-400" />
@@ -211,7 +211,7 @@ export default function FillInBlankModal({
           {/* Discrete Letter Slots Grid */}
           <div className="flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-4 gap-y-3 py-2 select-none">
             {targetChunks.map((chunk: string[], wordIdx: number) => (
-              <div key={wordIdx} className="flex items-center gap-1 sm:gap-1.5">
+              <div key={wordIdx} className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 max-w-full">
                 {chunk.map((_: string, charIdx: number) => {
                   const currentSlot = globalSlotIndex++;
                   const isFilled = !!letters[currentSlot];
@@ -226,14 +226,14 @@ export default function FillInBlankModal({
                         onChange={(e) => handleSlotChange(currentSlot, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(currentSlot, e)}
                         onPaste={(e) => handlePaste(currentSlot, e)}
-                        className={`w-9 h-11 sm:w-11 sm:h-12 text-center text-lg sm:text-xl font-bold uppercase rounded-lg border transition-all outline-none font-mono ${
+                        className={`w-7.5 h-9.5 xs:w-8 xs:h-10 sm:w-11 sm:h-12 text-center text-base sm:text-xl font-bold uppercase rounded-lg border transition-all outline-none font-mono ${
                           isFilled
                             ? 'bg-sky-500/15 border-sky-400 text-white'
                             : 'bg-black/40 border-white/20 text-slate-300 hover:border-white/40 focus:border-sky-400 focus:bg-sky-500/10'
                         }`}
                         placeholder="_"
                       />
-                      <span className="text-[9px] text-slate-500">
+                      <span className="text-[8px] sm:text-[9px] text-slate-500">
                         {charIdx + 1}
                       </span>
                     </div>
@@ -279,7 +279,7 @@ export default function FillInBlankModal({
       </div>
 
       {/* Fixed Footer & Submit Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
         <div className="text-xs text-slate-400">
           <span>Objective Evaluation • Exact letter & keyword match</span>
         </div>

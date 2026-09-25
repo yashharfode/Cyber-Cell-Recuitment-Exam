@@ -134,7 +134,7 @@ export default function Login() {
                 required
                 type="text"
                 placeholder="Enter your Name"
-                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-xs"
+                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-base sm:text-xs"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
               />
@@ -151,7 +151,7 @@ export default function Login() {
                 required
                 type="text"
                 placeholder="Enter your Scholar Number"
-                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-xs"
+                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-base sm:text-xs"
                 value={formData.scholarNumber}
                 onChange={e => setFormData({ ...formData, scholarNumber: e.target.value })}
               />
@@ -168,7 +168,7 @@ export default function Login() {
                 required
                 type="email"
                 placeholder="Enter your Email (e.g. name@example.com)"
-                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-xs"
+                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-base sm:text-xs"
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
               />
@@ -185,7 +185,7 @@ export default function Login() {
                 required
                 type="password"
                 placeholder="Enter your Password"
-                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-xs"
+                className="w-full bg-[#080C14] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-slate-500 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 transition-all text-base sm:text-xs"
                 value={formData.password}
                 onChange={e => setFormData({ ...formData, password: e.target.value })}
               />

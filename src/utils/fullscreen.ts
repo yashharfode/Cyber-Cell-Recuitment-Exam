@@ -3,7 +3,25 @@
  * Ensures seamless fullscreen enforcement across Chrome, Firefox, Edge, Safari, and Windows webviews.
  */
 
+export const isDOMFullscreenSupported = (): boolean => {
+  if (typeof document === 'undefined') return false;
+  const d = document as any;
+  return !!(
+    d.fullscreenEnabled ||
+    d.webkitFullscreenEnabled ||
+    d.mozFullScreenEnabled ||
+    d.msFullscreenEnabled ||
+    (d.documentElement && (d.documentElement.requestFullscreen || d.documentElement.webkitRequestFullscreen))
+  );
+};
+
 export const isBrowserFullscreen = (): boolean => {
+  if (typeof document === 'undefined') return true;
+  // If the device/browser doesn't support the DOM fullscreen API (e.g. iPhone Safari),
+  // do not treat it as non-fullscreen violation. Anti-cheat on these devices relies on pagehide & visibilitychange.
+  if (!isDOMFullscreenSupported()) {
+    return true;
+  }
   const d = document as any;
   return !!(
     d.fullscreenElement ||

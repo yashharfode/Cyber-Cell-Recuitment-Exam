@@ -61,11 +61,13 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
     FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenState));
     document.addEventListener('visibilitychange', handleVisibilityState);
     window.addEventListener('blur', handleVisibilityState);
+    window.addEventListener('pagehide', handleVisibilityState);
 
     return () => {
       FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenState));
       document.removeEventListener('visibilitychange', handleVisibilityState);
       window.removeEventListener('blur', handleVisibilityState);
+      window.removeEventListener('pagehide', handleVisibilityState);
     };
   }, [onClose]);
 
@@ -183,45 +185,45 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-5 pointer-events-auto select-none font-sans cursor-default overflow-hidden">
-      <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[88vh] shadow-2xl rounded-xl animate-scaleIn cursor-default overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-5 pointer-events-auto select-none font-sans cursor-default overflow-hidden">
+      <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[94vh] sm:max-h-[88vh] shadow-2xl rounded-xl animate-scaleIn cursor-default overflow-hidden">
         
         {/* Fixed Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18] shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg">
+        <div className="flex items-center justify-between border-b border-white/[0.08] px-4 sm:px-6 py-3 sm:py-4 bg-[#090D18] shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="p-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg shrink-0">
               <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded truncate max-w-[120px] sm:max-w-none">
                   {challenge.category}
                 </span>
-                <span className="text-[10px] text-slate-400 uppercase">
+                <span className="text-[10px] text-slate-400 uppercase hidden xs:inline sm:inline">
                   {challenge.skill} • {challenge.difficulty}
                 </span>
               </div>
-              <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5">
+              <h2 className="text-sm sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5 truncate sm:whitespace-normal">
                 {challenge.title}
               </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-md">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
+            <div className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-md">
               <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span className={secondsRemaining < 15 ? 'text-red-400 font-bold animate-pulse' : 'text-slate-300'}>
                 {secondsRemaining}s
               </span>
             </div>
-            <div className="text-xs px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md">
+            <div className="text-xs px-2 sm:px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md">
               +{challenge.points} PTS
             </div>
           </div>
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
+        <div className="flex-1 overflow-y-auto min-h-0 px-4 sm:px-6 py-3.5 sm:py-5 space-y-4">
           {/* Visual Story Case Mockup (if available) */}
           {challenge.visualCase && !challenge.interactiveType && (
             <VisualCaseViewer visualCase={challenge.visualCase} />
@@ -380,8 +382,8 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
         </div>
 
         {/* Fixed Footer Actions - ALWAYS visible on screen */}
-        <div className="flex justify-between items-center px-6 py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
+          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-400">
             <CornerDownLeft className="w-4 h-4 text-sky-400" />
             <span>Press <kbd className="px-1.5 py-0.5 bg-black/40 border border-white/15 text-white rounded font-mono text-[10px]">ENTER</kbd> to {isSubmitted ? 'proceed to next' : 'submit'}</span>
           </div>
@@ -391,18 +393,18 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
               type="button"
               onClick={handleSubmit}
               disabled={!selectedOption && selectedOptions.length === 0 && challenge.type !== 'sequence'}
-              className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-sky-600" />
-              <span>SUBMIT ANSWER [ ↵ ]</span>
+              <span>SUBMIT ANSWER</span>
             </button>
           ) : (
             <button
               type="button"
               onClick={handleNextOrClose}
-              className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 sm:py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>NEXT QUESTION [ ↵ ]</span>
+              <span>NEXT QUESTION</span>
               <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
           )}
