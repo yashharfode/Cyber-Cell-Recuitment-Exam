@@ -621,10 +621,10 @@ export default function Round2Assessment() {
          currentChallenge.tier !== 'fill_in_blank' && 
          currentChallenge.tier !== 'subjective' && 
          currentChallenge.tier !== 'practical' && (
-          <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 p-6 md:p-8 flex flex-col shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn">
+          <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 flex flex-col max-h-[85vh] shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn overflow-hidden my-auto">
             
-            {/* Challenge Header */}
-            <div className="flex items-center justify-between border-b border-cyber-border pb-4 mb-5">
+            {/* Challenge Header - Fixed */}
+            <div className="flex items-center justify-between border-b border-cyber-border px-6 py-4 bg-[#080C14] shrink-0">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/30 rounded">
@@ -634,71 +634,74 @@ export default function Round2Assessment() {
                     {currentChallenge.domain} • {currentChallenge.subSkill}
                   </span>
                 </div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-wide mt-1">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5">
                   {currentChallenge.title}
                 </h2>
               </div>
-              <div className="text-xs px-3 py-1 bg-cyber-primary text-black font-bold rounded">
+              <div className="text-xs px-3 py-1 bg-cyber-primary text-black font-bold rounded shrink-0">
                 +{currentChallenge.points} PTS
               </div>
             </div>
 
-            {/* Prompt Box */}
-            <div className="mb-6 p-4 bg-[#05070D] border border-cyber-border/80 rounded leading-relaxed text-sm text-cyber-text whitespace-pre-wrap">
-              {currentChallenge.prompt}
+            {/* Scrollable Content Body */}
+            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4 sm:py-5 space-y-4">
+              {/* Prompt Box */}
+              <div className="p-3.5 bg-[#05070D] border border-cyber-border/80 rounded leading-relaxed text-sm text-cyber-text whitespace-pre-wrap">
+                {currentChallenge.prompt}
+              </div>
+
+              {/* MCQ Options */}
+              {currentChallenge.options && (
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center mb-1">
+                    <p className="text-xs text-cyber-muted font-bold uppercase tracking-wider">
+                      SELECT YOUR ANSWER:
+                    </p>
+                    <span className="text-[11px] text-cyber-primary/80 hidden sm:inline-block">
+                      Tip: Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">A</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">B</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">C</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">D</kbd> or <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">↵ ENTER</kbd>
+                    </span>
+                  </div>
+
+                  {currentChallenge.options.map((opt, idx) => {
+                    const isSelected = selectedOption === opt;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={isSubmittedCurrent}
+                        onClick={() => setSelectedOption(opt)}
+                        className={`w-full text-left p-3.5 text-sm transition-all duration-200 transform hover:scale-[1.005] active:scale-[0.99] border rounded flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
+                          isSelected
+                            ? 'border-cyber-primary bg-cyber-primary/15 text-white shadow-[0_0_15px_rgba(0,255,204,0.15)] font-medium'
+                            : 'border-cyber-border bg-[#0B1018] text-cyber-muted hover:border-cyber-primary/40 hover:text-white'
+                        }`}
+                      >
+                        <span className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-xs font-bold border transition-colors ${
+                          isSelected ? 'border-cyber-primary bg-cyber-primary text-black' : 'border-cyber-border text-cyber-muted'
+                        }`}>
+                          {String.fromCharCode(65 + idx)}
+                        </span>
+                        <span className="leading-snug pt-0.5">{cleanOptionText(opt)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Neutral Response Recorded Confirmation (No correct/wrong or explanation during test) */}
+              {isSubmittedCurrent && (
+                <div className="p-3.5 border border-cyber-primary/40 bg-cyber-primary/10 rounded flex items-center justify-between text-cyber-primary animate-fadeIn">
+                  <div className="flex items-center gap-2.5 text-sm font-bold">
+                    <CheckCircle2 className="w-5 h-5 text-cyber-primary" />
+                    <span>RESPONSE RECORDED</span>
+                  </div>
+                  <span className="text-xs text-cyber-muted hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
+                </div>
+              )}
             </div>
 
-            {/* MCQ Options */}
-            {currentChallenge.options && (
-              <div className="space-y-3 flex-1">
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs text-cyber-muted font-bold uppercase tracking-wider">
-                    SELECT YOUR ANSWER:
-                  </p>
-                  <span className="text-[11px] text-cyber-primary/80 hidden sm:inline-block">
-                    Tip: Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">A</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">B</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">C</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">D</kbd> or <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">↵ ENTER</kbd>
-                  </span>
-                </div>
-
-                {currentChallenge.options.map((opt, idx) => {
-                  const isSelected = selectedOption === opt;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      disabled={isSubmittedCurrent}
-                      onClick={() => setSelectedOption(opt)}
-                      className={`w-full text-left p-4 text-sm transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] border rounded flex items-start gap-3.5 cursor-pointer disabled:cursor-not-allowed ${
-                        isSelected
-                          ? 'border-cyber-primary bg-cyber-primary/15 text-white shadow-[0_0_15px_rgba(0,255,204,0.15)] font-medium'
-                          : 'border-cyber-border bg-[#0B1018] text-cyber-muted hover:border-cyber-primary/40 hover:text-white'
-                      }`}
-                    >
-                      <span className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold border transition-colors ${
-                        isSelected ? 'border-cyber-primary bg-cyber-primary text-black' : 'border-cyber-border text-cyber-muted'
-                      }`}>
-                        {String.fromCharCode(65 + idx)}
-                      </span>
-                      <span className="leading-snug pt-0.5">{cleanOptionText(opt)}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Neutral Response Recorded Confirmation (No correct/wrong or explanation during test) */}
-            {isSubmittedCurrent && (
-              <div className="mt-6 p-4 border border-cyber-primary/40 bg-cyber-primary/10 rounded flex items-center justify-between text-cyber-primary animate-fadeIn">
-                <div className="flex items-center gap-2.5 text-sm font-bold">
-                  <CheckCircle2 className="w-5 h-5 text-cyber-primary" />
-                  <span>RESPONSE RECORDED</span>
-                </div>
-                <span className="text-xs text-cyber-muted hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="flex justify-between items-center mt-6 pt-4 border-t border-cyber-border">
+            {/* Footer - Fixed */}
+            <div className="flex justify-between items-center px-6 py-3.5 border-t border-cyber-border bg-[#080C14] shrink-0">
               <div className="flex items-center gap-2 text-xs text-cyber-muted">
                 <CornerDownLeft className="w-4 h-4 text-cyber-primary" />
                 <span>Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border text-white rounded font-bold">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
@@ -709,7 +712,7 @@ export default function Round2Assessment() {
                   type="button"
                   onClick={handleMcqSubmit}
                   disabled={!selectedOption}
-                  className="px-6 py-3 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>SUBMIT ANSWER [ ↵ ]</span>
@@ -718,7 +721,7 @@ export default function Round2Assessment() {
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="px-6 py-3 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,204,0.3)] transform active:scale-95 cursor-pointer"
+                  className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,204,0.3)] transform active:scale-95 cursor-pointer"
                 >
                   <span>NEXT CHALLENGE [ ↵ ]</span>
                   <ArrowRight className="w-4 h-4" />

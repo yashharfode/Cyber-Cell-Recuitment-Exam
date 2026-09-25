@@ -183,14 +183,14 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 pointer-events-auto select-none font-mono-cyber cursor-default">
-      <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 p-6 md:p-8 flex flex-col max-h-[92vh] overflow-y-auto shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn cursor-default">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-5 pointer-events-auto select-none font-mono-cyber cursor-default overflow-hidden">
+      <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 flex flex-col max-h-[88vh] shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn cursor-default overflow-hidden">
         
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-cyber-border pb-4 mb-5">
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between border-b border-cyber-border px-5 sm:px-7 py-3.5 sm:py-4 bg-[#080C14] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-cyber-primary/10 border border-cyber-primary/40 rounded">
-              <FileText className="w-5 h-5 text-cyber-primary" />
+            <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/40 rounded">
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyber-primary" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -201,39 +201,41 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
                   {challenge.skill} • {challenge.difficulty}
                 </span>
               </div>
-              <h2 className="text-lg md:text-xl font-bold text-white tracking-wide mt-1">
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5">
                 {challenge.title}
               </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-cyber-panel-secondary border border-cyber-border text-xs rounded">
-              <Clock className="w-4 h-4 text-cyber-warning" />
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-cyber-panel-secondary border border-cyber-border text-xs rounded">
+              <Clock className="w-3.5 h-3.5 text-cyber-warning" />
               <span className={secondsRemaining < 15 ? 'text-cyber-danger font-bold animate-pulse' : 'text-cyber-text'}>
                 {secondsRemaining}s
               </span>
             </div>
-            <div className="text-xs px-3 py-1 bg-cyber-primary text-black font-bold rounded">
+            <div className="text-xs px-2.5 py-1 bg-cyber-primary text-black font-bold rounded">
               +{challenge.points} PTS
             </div>
           </div>
         </div>
 
-        {/* Visual Story Case Mockup (if available) */}
-        {challenge.visualCase && !challenge.interactiveType && (
-          <VisualCaseViewer visualCase={challenge.visualCase} />
-        )}
+        {/* Scrollable Content Body */}
+        <div className="flex-1 overflow-y-auto min-h-0 px-5 sm:px-7 py-4 sm:py-5 space-y-4">
+          {/* Visual Story Case Mockup (if available) */}
+          {challenge.visualCase && !challenge.interactiveType && (
+            <VisualCaseViewer visualCase={challenge.visualCase} />
+          )}
 
-        {/* Case Narrative Dossier Box */}
-        {challenge.prompt && (
-          <div className="mb-6 p-4 bg-[#05070D] border border-cyber-border/80 rounded leading-relaxed text-sm text-cyber-text whitespace-pre-wrap select-none">
-            {challenge.prompt}
-          </div>
-        )}
+          {/* Case Narrative Dossier Box */}
+          {challenge.prompt && (
+            <div className="p-3.5 bg-[#05070D] border border-cyber-border/80 rounded leading-relaxed text-sm text-cyber-text whitespace-pre-wrap select-none">
+              {challenge.prompt}
+            </div>
+          )}
 
-        {/* Challenge Interactive Mini Game or Standard Options */}
-        <div className="flex-1 my-1">
+          {/* Challenge Interactive Mini Game or Standard Options */}
+          <div className="my-1">
           {/* Interactive Mini Game */}
           {challenge.interactiveType && (
             <div className="my-2">
@@ -365,19 +367,20 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
           )}
         </div>
 
-        {/* Neutral Submission Confirmation Banner (No right/wrong or explanation revealed during test) */}
-        {isSubmitted && (
-          <div className="mt-6 p-4 border border-cyber-primary/40 bg-cyber-primary/10 rounded font-mono-cyber flex items-center justify-between animate-fadeIn text-cyber-primary">
-            <div className="flex items-center gap-2.5 text-sm font-bold">
-              <CheckCircle2 className="w-5 h-5 text-cyber-primary" />
-              <span>RESPONSE RECORDED</span>
+          {/* Neutral Submission Confirmation Banner (No right/wrong or explanation revealed during test) */}
+          {isSubmitted && (
+            <div className="p-3.5 border border-cyber-primary/40 bg-cyber-primary/10 rounded font-mono-cyber flex items-center justify-between animate-fadeIn text-cyber-primary">
+              <div className="flex items-center gap-2.5 text-sm font-bold">
+                <CheckCircle2 className="w-5 h-5 text-cyber-primary" />
+                <span>RESPONSE RECORDED</span>
+              </div>
+              <span className="text-xs text-cyber-muted hidden sm:inline">Press ENTER or click Next Question to continue</span>
             </div>
-            <span className="text-xs text-cyber-muted hidden sm:inline">Press ENTER or click Next Question to continue</span>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Footer Actions with Enter Key Badges */}
-        <div className="flex justify-between items-center mt-6 pt-4 border-t border-cyber-border">
+        {/* Fixed Footer Actions - ALWAYS visible on screen */}
+        <div className="flex justify-between items-center px-5 sm:px-7 py-3.5 border-t border-cyber-border bg-[#080C14] shrink-0">
           <div className="flex items-center gap-2 text-xs text-cyber-muted">
             <CornerDownLeft className="w-4 h-4 text-cyber-primary" />
             <span>Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border text-white rounded font-bold">ENTER</kbd> to {isSubmitted ? 'proceed to next' : 'submit'}</span>
@@ -388,7 +391,7 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
               type="button"
               onClick={handleSubmit}
               disabled={!selectedOption && selectedOptions.length === 0 && challenge.type !== 'sequence'}
-              className="px-6 py-3 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               SUBMIT ANSWER [ ↵ ]
@@ -397,7 +400,7 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
             <button
               type="button"
               onClick={handleNextOrClose}
-              className="px-6 py-3 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,204,0.3)] transform active:scale-95 cursor-pointer"
+              className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,204,0.3)] transform active:scale-95 cursor-pointer"
             >
               <span>NEXT QUESTION [ ↵ ]</span>
               <ArrowRight className="w-4 h-4" />
