@@ -38,62 +38,62 @@ export default function SubjectiveQuestionModal({
   };
 
   return (
-    <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 flex flex-col max-h-[85vh] shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn font-mono-cyber overflow-hidden my-auto">
+    <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[85vh] shadow-2xl rounded-xl animate-scaleIn font-sans overflow-hidden my-auto">
       
       {/* Header - Fixed */}
-      <div className="flex items-center justify-between border-b border-cyber-border px-6 py-4 bg-[#080C14] shrink-0">
+      <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18] shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-cyber-primary/10 border border-cyber-primary/40 rounded">
-            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-cyber-primary" />
+          <div className="p-2 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-lg">
+            <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/30 rounded">
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
                 TIER 3 • SUBJECTIVE CONCEPT
               </span>
-              <span className="text-[10px] text-cyber-muted uppercase">
+              <span className="text-[10px] text-slate-400 uppercase">
                 {challenge.domain} • {challenge.subSkill}
               </span>
             </div>
-            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5">
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-1">
               {challenge.title}
             </h2>
           </div>
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-cyber-panel-secondary border border-cyber-border text-xs rounded">
-            <Clock className="w-3.5 h-3.5 text-cyber-warning" />
-            <span className={secondsRemaining < 30 ? 'text-cyber-danger font-bold animate-pulse' : 'text-cyber-text'}>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.04] border border-white/[0.08] text-xs rounded-md">
+            <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <span className={secondsRemaining < 30 ? 'text-red-400 font-bold animate-pulse' : 'text-slate-300'}>
               {secondsRemaining}s
             </span>
           </div>
-          <div className="text-xs px-2.5 py-1 bg-cyber-primary text-black font-bold rounded">
+          <div className="text-xs px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md">
             +{challenge.points} PTS
           </div>
         </div>
       </div>
 
       {/* Scrollable Content Body */}
-      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4 sm:py-5 space-y-4">
+      <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
         {/* Question Prompt */}
-        <div className="p-3.5 bg-[#05070D] border border-cyber-border/80 rounded text-sm text-cyber-text leading-relaxed">
-          <p className="font-bold text-white mb-1 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-cyber-primary" />
+        <div className="p-4 bg-[#070A12] border border-white/[0.06] rounded-lg text-sm text-slate-200 leading-relaxed">
+          <p className="font-semibold text-white mb-1 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-sky-400" />
             CONCEPTUAL INVESTIGATION PROMPT:
           </p>
-          <p className="text-sm text-slate-200 mt-2 whitespace-pre-wrap">
+          <p className="text-sm text-slate-300 mt-2 whitespace-pre-wrap">
             {challenge.prompt}
           </p>
         </div>
 
         {/* Answer Input Area */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-cyber-muted">
-            <span className="flex items-center gap-1.5 text-cyber-primary">
+          <div className="flex items-center justify-between text-xs text-slate-400">
+            <span className="flex items-center gap-1.5 text-slate-300">
               <span>✍️</span> Type your technical explanation below:
             </span>
-            <span className={charCount > maxChars ? 'text-cyber-danger font-bold' : 'text-cyber-muted'}>
+            <span className={charCount > maxChars ? 'text-red-400 font-semibold' : 'text-slate-400'}>
               {charCount} / {maxChars} characters ({wordCount} words)
             </span>
           </div>
@@ -103,11 +103,11 @@ export default function SubjectiveQuestionModal({
             value={answerText}
             onChange={(e) => setAnswerText(e.target.value.slice(0, maxChars))}
             placeholder="Formulate your explanation here. Describe the core purpose, relationships, and technical reason in your own words..."
-            className="w-full p-3.5 bg-[#0B1018] border border-cyber-border focus:border-cyber-primary text-white text-sm rounded outline-none font-mono-cyber resize-none transition-colors leading-relaxed shadow-inner"
+            className="w-full p-3.5 bg-[#090D18] border border-white/15 focus:border-sky-400 text-white text-sm rounded-lg outline-none font-sans resize-none transition-colors leading-relaxed shadow-sm"
           />
 
-          <div className="flex items-center gap-2 text-[11px] text-cyber-muted bg-cyber-panel-secondary p-2.5 rounded border border-cyber-border">
-            <AlertCircle className="w-4 h-4 text-cyber-info shrink-0" />
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.06]">
+            <AlertCircle className="w-4 h-4 text-sky-400 shrink-0" />
             <span>
               Scoring evaluates technical concept coverage, logic, and clarity. Minor spelling or typing errors are not penalized.
             </span>
@@ -116,17 +116,17 @@ export default function SubjectiveQuestionModal({
       </div>
 
       {/* Fixed Footer */}
-      <div className="flex justify-between items-center px-6 py-3.5 border-t border-cyber-border bg-[#080C14] shrink-0">
-        <span className="text-xs text-cyber-muted">
+      <div className="flex justify-between items-center px-6 py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
+        <span className="text-xs text-slate-400">
           {wordCount >= 3 ? 'Ready to submit.' : 'Please provide at least a few words.'}
         </span>
 
         <button
           onClick={handleSubmit}
           disabled={wordCount < 3 || isSubmitting}
-          className="px-5 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-4 h-4 text-slate-950" />
           <span>SUBMIT EXPLANATION</span>
         </button>
       </div>

@@ -621,32 +621,32 @@ export default function Round2Assessment() {
          currentChallenge.tier !== 'fill_in_blank' && 
          currentChallenge.tier !== 'subjective' && 
          currentChallenge.tier !== 'practical' && (
-          <div className="w-full max-w-3xl cyber-panel border border-cyber-primary/40 flex flex-col max-h-[85vh] shadow-[0_0_50px_rgba(0,255,204,0.15)] rounded-lg animate-scaleIn overflow-hidden my-auto">
+          <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.1] flex flex-col max-h-[85vh] shadow-2xl rounded-xl animate-scaleIn overflow-hidden my-auto font-sans">
             
             {/* Challenge Header - Fixed */}
-            <div className="flex items-center justify-between border-b border-cyber-border px-6 py-4 bg-[#080C14] shrink-0">
+            <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18] shrink-0">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-cyber-primary/20 text-cyber-primary border border-cyber-primary/30 rounded">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
                     {currentChallenge.tier === 'knowledge' ? 'TIER 1 • KNOWLEDGE' : 'TIER 2 • APPLICATION'}
                   </span>
-                  <span className="text-[10px] text-cyber-muted uppercase">
+                  <span className="text-[10px] text-slate-400 uppercase">
                     {currentChallenge.domain} • {currentChallenge.subSkill}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-0.5">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-wide mt-1">
                   {currentChallenge.title}
                 </h2>
               </div>
-              <div className="text-xs px-3 py-1 bg-cyber-primary text-black font-bold rounded shrink-0">
+              <div className="text-xs px-2.5 py-1 bg-white/[0.08] text-slate-200 border border-white/[0.12] font-semibold rounded-md shrink-0">
                 +{currentChallenge.points} PTS
               </div>
             </div>
 
             {/* Scrollable Content Body */}
-            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-4 sm:py-5 space-y-4">
+            <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
               {/* Prompt Box */}
-              <div className="p-3.5 bg-[#05070D] border border-cyber-border/80 rounded leading-relaxed text-sm text-cyber-text whitespace-pre-wrap">
+              <div className="p-4 bg-[#070A12] border border-white/[0.06] rounded-lg leading-relaxed text-sm text-slate-200 whitespace-pre-wrap">
                 {currentChallenge.prompt}
               </div>
 
@@ -654,11 +654,11 @@ export default function Round2Assessment() {
               {currentChallenge.options && (
                 <div className="space-y-2.5">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs text-cyber-muted font-bold uppercase tracking-wider">
+                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                       SELECT YOUR ANSWER:
                     </p>
-                    <span className="text-[11px] text-cyber-primary/80 hidden sm:inline-block">
-                      Tip: Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">A</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">B</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">C</kbd> <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">D</kbd> or <kbd className="px-1.5 py-0.5 bg-black border border-cyber-primary/50 text-cyber-primary rounded">↵ ENTER</kbd>
+                    <span className="text-[11px] text-slate-400 hidden sm:inline-block">
+                      Tip: Press <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">D</kbd> or <kbd className="px-1.5 py-0.5 bg-black/50 border border-white/20 text-slate-300 rounded text-[10px]">↵ ENTER</kbd>
                     </span>
                   </div>
 
@@ -670,14 +670,14 @@ export default function Round2Assessment() {
                         type="button"
                         disabled={isSubmittedCurrent}
                         onClick={() => setSelectedOption(opt)}
-                        className={`w-full text-left p-3.5 text-sm transition-all duration-200 transform hover:scale-[1.005] active:scale-[0.99] border rounded flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
+                        className={`w-full text-left p-3.5 text-sm transition-all rounded-lg flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
                           isSelected
-                            ? 'border-cyber-primary bg-cyber-primary/15 text-white shadow-[0_0_15px_rgba(0,255,204,0.15)] font-medium'
-                            : 'border-cyber-border bg-[#0B1018] text-cyber-muted hover:border-cyber-primary/40 hover:text-white'
+                            ? 'border border-sky-500/80 bg-sky-500/10 text-white font-medium'
+                            : 'border border-white/[0.08] bg-[#0A0F1D] text-slate-300 hover:border-white/20 hover:text-white hover:bg-[#0E1528]'
                         }`}
                       >
-                        <span className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-xs font-bold border transition-colors ${
-                          isSelected ? 'border-cyber-primary bg-cyber-primary text-black' : 'border-cyber-border text-cyber-muted'
+                        <span className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border transition-colors ${
+                          isSelected ? 'border-sky-500 bg-sky-500 text-slate-950 font-bold' : 'border-white/15 text-slate-400 bg-white/[0.03]'
                         }`}>
                           {String.fromCharCode(65 + idx)}
                         </span>
@@ -688,23 +688,23 @@ export default function Round2Assessment() {
                 </div>
               )}
 
-              {/* Neutral Response Recorded Confirmation (No correct/wrong or explanation during test) */}
+              {/* Neutral Response Recorded Confirmation */}
               {isSubmittedCurrent && (
-                <div className="p-3.5 border border-cyber-primary/40 bg-cyber-primary/10 rounded flex items-center justify-between text-cyber-primary animate-fadeIn">
-                  <div className="flex items-center gap-2.5 text-sm font-bold">
-                    <CheckCircle2 className="w-5 h-5 text-cyber-primary" />
+                <div className="p-3.5 border border-sky-500/30 bg-sky-500/10 rounded-lg flex items-center justify-between text-sky-300 animate-fadeIn">
+                  <div className="flex items-center gap-2.5 text-sm font-semibold">
+                    <CheckCircle2 className="w-5 h-5 text-sky-400" />
                     <span>RESPONSE RECORDED</span>
                   </div>
-                  <span className="text-xs text-cyber-muted hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
+                  <span className="text-xs text-slate-400 hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
                 </div>
               )}
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex justify-between items-center px-6 py-3.5 border-t border-cyber-border bg-[#080C14] shrink-0">
-              <div className="flex items-center gap-2 text-xs text-cyber-muted">
-                <CornerDownLeft className="w-4 h-4 text-cyber-primary" />
-                <span>Press <kbd className="px-1.5 py-0.5 bg-black border border-cyber-border text-white rounded font-bold">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
+            <div className="flex justify-between items-center px-6 py-4 border-t border-white/[0.08] bg-[#090D18] shrink-0">
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <CornerDownLeft className="w-4 h-4 text-sky-400" />
+                <span>Press <kbd className="px-1.5 py-0.5 bg-black/40 border border-white/15 text-white rounded font-mono text-[10px]">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
               </div>
 
               {!isSubmittedCurrent ? (
@@ -712,19 +712,19 @@ export default function Round2Assessment() {
                   type="button"
                   onClick={handleMcqSubmit}
                   disabled={!selectedOption}
-                  className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all shadow-[0_0_20px_rgba(0,255,204,0.3)] rounded flex items-center gap-2 transform active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4 text-sky-600" />
                   <span>SUBMIT ANSWER [ ↵ ]</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="px-6 py-2.5 bg-cyber-primary text-black font-bold text-xs uppercase tracking-wider hover:bg-white transition-all rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,204,0.3)] transform active:scale-95 cursor-pointer"
+                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm active:scale-95 cursor-pointer flex items-center gap-2"
                 >
                   <span>NEXT CHALLENGE [ ↵ ]</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
                 </button>
               )}
             </div>

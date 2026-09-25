@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cyber-bg: #05070D;
-  --color-cyber-panel: #0B1018;
-  --color-cyber-panel-secondary: #101721;
-  --color-cyber-primary: #00ffcc;
-  --color-cyber-secondary: #7000ff;
-  --color-cyber-text: #EAF7F5;
-  --color-cyber-muted: #8DA3A0;
-  --color-cyber-success: #22C55E;
+  --color-cyber-bg: #080C14;
+  --color-cyber-panel: #0E1424;
+  --color-cyber-panel-secondary: #141D30;
+  --color-cyber-primary: #38BDF8;
+  --color-cyber-secondary: #818CF8;
+  --color-cyber-text: #F1F5F9;
+  --color-cyber-muted: #94A3B8;
+  --color-cyber-success: #10B981;
   --color-cyber-warning: #F59E0B;
   --color-cyber-danger: #EF4444;
   --color-cyber-info: #38BDF8;
   --color-cyber-border: rgba(255, 255, 255, 0.08);
-  --color-cyber-border-glow: rgba(0, 255, 204, 0.25);
+  --color-cyber-border-glow: rgba(56, 189, 248, 0.2);
 }
 
 @layer base {
@@ -33,8 +33,8 @@
   }
 
   body {
-    background-color: #05070D;
-    color: #EAF7F5;
+    background-color: #080C14;
+    color: #F1F5F9;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     margin: 0;
     padding: 0;
@@ -43,59 +43,58 @@
   }
 }
 
-/* Monospace font styling for terminal/hud */
+/* Monospace font styling for terminal/hud/code */
 .font-mono-cyber {
-  font-family: 'Fira Code', 'JetBrains Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
 }
 
-/* Subtle cyber scanline effect */
+/* Subtle architectural grid */
 .cyber-grid {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
 .cyber-panel {
-  background: #0B1018;
+  background: #0E1424;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .cyber-panel-glow {
-  background: #0B1018;
-  border: 1px solid rgba(0, 255, 204, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 204, 0.08);
+  background: #0E1424;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
 }
 
 /* Animation keyframes */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
 .animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 .animate-scaleIn {
-  animation: scaleIn 0.25s ease-out forwards;
+  animation: scaleIn 0.2s ease-out forwards;
 }
 
-/* Scrollbar */
+/* Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070D;
+  background: #080C14;
 }
 ::-webkit-scrollbar-thumb {
-  background: #101721;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  background: #1E293B;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00ffcc;
+  background: #334155;
 }

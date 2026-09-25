@@ -299,14 +299,14 @@ export default function GameMode() {
 
       {/* Level Up Celebration Toast Notification */}
       {showLevelUpAlert && (
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 bg-[#0B1018] border-2 border-cyber-primary p-4 rounded-lg shadow-[0_0_40px_rgba(0,255,204,0.4)] flex items-center gap-3 animate-fadeIn">
-          <Trophy className="w-7 h-7 text-cyber-warning animate-bounce" />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 bg-[#0D1322] border border-white/[0.12] p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fadeIn font-sans">
+          <Trophy className="w-6 h-6 text-amber-400" />
           <div>
-            <div className="text-xs uppercase text-cyber-primary font-bold tracking-widest flex items-center gap-1.5">
+            <div className="text-xs uppercase text-sky-400 font-semibold tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
-              EXCELLENT INVESTIGATION!
+              LEVEL COMPLETED
             </div>
-            <div className="text-sm font-bold text-white mt-0.5">
+            <div className="text-sm font-semibold text-white mt-0.5">
               {showLevelUpAlert}
             </div>
           </div>
@@ -315,14 +315,14 @@ export default function GameMode() {
 
       {/* Pointer Lock Overlay */}
       {!isLocked && !activeChallenge && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-[2px] pointer-events-auto">
-          <div className="text-center p-6 bg-[#0B1018] border border-cyber-primary/40 shadow-[0_0_35px_rgba(0,255,204,0.2)] max-w-md rounded-lg animate-scaleIn">
-            <Shield className="w-12 h-12 text-cyber-primary mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-white tracking-wider">CLICK TO CONTROL AGENT</h3>
-            <p className="text-xs text-cyber-muted mt-2 leading-relaxed">
-              Click anywhere to steer your agent. Walk over to the central console and press <span className="text-cyber-primary font-bold">[E]</span> to open the case investigation file.
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 backdrop-blur-sm pointer-events-auto font-sans">
+          <div className="text-center p-6 bg-[#0D1322] border border-white/[0.1] shadow-2xl max-w-md rounded-xl animate-scaleIn">
+            <Shield className="w-10 h-10 text-sky-400 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-white tracking-wide uppercase">CLICK TO CONTROL AGENT</h3>
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              Click anywhere to steer your agent. Walk over to the central console and press <span className="text-white font-semibold">[E]</span> to open the case investigation file.
             </p>
-            <div className="mt-4 px-4 py-2 bg-cyber-primary/10 border border-cyber-primary/30 text-cyber-primary text-xs font-bold rounded inline-block">
+            <div className="mt-4 px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.08] text-slate-300 text-xs font-medium rounded-lg inline-block font-mono">
               {mode === 'demo' ? 'DEMO MODE (PRACTICE)' : 'RECRUITMENT MODE ACTIVE'}
             </div>
           </div>
@@ -330,51 +330,50 @@ export default function GameMode() {
       )}
 
       {/* Proximity Aim Target */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 font-sans">
         {inRangeOfTerminal ? (
           <div className="flex flex-col items-center gap-1.5 animate-scaleIn">
-            <div className="w-4 h-4 border-2 border-cyber-primary rotate-45 animate-spin" style={{ animationDuration: '4s' }} />
-            <span className="text-xs font-bold text-black bg-cyber-primary px-3 py-1 rounded shadow-[0_0_15px_rgba(0,255,204,0.6)]">
+            <span className="text-xs font-semibold text-slate-950 bg-white px-3 py-1 rounded-md shadow-sm">
               [E] OPEN CASE FILE
             </span>
           </div>
         ) : (
-          <div className="w-2 h-2 bg-cyber-primary/70 rounded-full ring-4 ring-cyber-primary/20" />
+          <div className="w-1.5 h-1.5 bg-white/70 rounded-full ring-4 ring-white/10" />
         )}
       </div>
 
       {/* Top Level Progression Bar */}
-      <div className="absolute top-0 inset-x-0 z-30 pointer-events-none p-3 md:p-5 flex flex-col gap-2">
+      <div className="absolute top-0 inset-x-0 z-30 pointer-events-none p-3 md:p-5 flex flex-col gap-2 font-sans">
         
         {/* Top Navbar Row */}
         <div className="flex justify-between items-center pointer-events-auto">
           {/* Club Logo */}
-          <div className="cyber-panel px-4 py-2 bg-[#0B1018]/90 backdrop-blur-sm border border-cyber-border rounded flex items-center gap-3">
-            <div className="w-2.5 h-2.5 bg-cyber-primary rounded-full animate-ping" />
+          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center gap-3">
+            <div className="w-2 h-2 bg-emerald-400 rounded-full" />
             <div>
-              <h1 className="text-xs md:text-sm font-bold text-cyber-primary tracking-widest">
+              <h1 className="text-xs md:text-sm font-bold text-white tracking-wide">
                 CYBER CELL • SATI VIDISHA
               </h1>
-              <p className="text-[10px] text-cyber-muted">OPERATION ZERO-DAY</p>
+              <p className="text-[10px] text-slate-400 font-mono">OPERATION ZERO-DAY</p>
             </div>
           </div>
 
           {/* Level Tracker Badge */}
-          <div className="cyber-panel px-5 py-2 bg-[#0B1018]/90 backdrop-blur-sm border border-cyber-primary/40 rounded flex items-center gap-3">
-            <Layers className="w-4 h-4 text-cyber-primary" />
+          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center gap-3">
+            <Layers className="w-4 h-4 text-sky-400" />
             <div>
-              <span className="text-[10px] text-cyber-muted uppercase block leading-none">ACTIVE LEVEL</span>
-              <span className="text-sm font-bold text-white">LEVEL {currentMissionIndex + 1} OF {missions.length}</span>
+              <span className="text-[10px] text-slate-400 uppercase block leading-none font-mono">ACTIVE LEVEL</span>
+              <span className="text-sm font-semibold text-white">LEVEL {currentMissionIndex + 1} OF {missions.length}</span>
             </div>
           </div>
 
           {/* Clock */}
-          <div className="cyber-panel px-4 py-2 bg-[#0B1018]/90 backdrop-blur-sm border border-cyber-border rounded text-right flex items-center gap-3">
-            <Clock className="w-4 h-4 text-cyber-warning" />
+          <div className="px-4 py-2 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl text-right flex items-center gap-3">
+            <Clock className="w-4 h-4 text-amber-400" />
             <div>
-              <span className="text-[10px] text-cyber-muted uppercase block leading-none">TIME REMAINING</span>
-              <span className={`text-base font-bold tracking-wider ${
-                timeRemainingSeconds < 300 ? 'text-cyber-danger animate-pulse' : 'text-cyber-primary'
+              <span className="text-[10px] text-slate-400 uppercase block leading-none font-mono">TIME REMAINING</span>
+              <span className={`text-sm font-mono font-semibold tracking-wider ${
+                timeRemainingSeconds < 300 ? 'text-red-400 animate-pulse' : 'text-slate-100'
               }`}>
                 {formatTimer(timeRemainingSeconds)}
               </span>
@@ -383,33 +382,33 @@ export default function GameMode() {
         </div>
 
         {/* 7-Level Step Indicator Bar */}
-        <div className="cyber-panel px-4 py-2.5 bg-[#0B1018]/90 backdrop-blur-sm border border-cyber-border rounded flex items-center justify-between gap-1 overflow-x-auto pointer-events-auto">
+        <div className="px-4 py-2.5 bg-[#090D18]/90 backdrop-blur-md border border-white/[0.08] rounded-xl flex items-center justify-between gap-1 overflow-x-auto pointer-events-auto">
           {missions.map((m, idx) => {
             const isCompleted = idx < currentMissionIndex;
             const isCurrent = idx === currentMissionIndex;
             return (
               <div key={m.id} className="flex items-center gap-1.5 flex-1 min-w-[90px]">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
                   isCompleted 
-                    ? 'bg-cyber-success text-black' 
+                    ? 'bg-emerald-500 text-slate-950' 
                     : isCurrent 
-                    ? 'bg-cyber-primary text-black ring-4 ring-cyber-primary/20 shadow-[0_0_12px_rgba(0,255,204,0.5)]' 
-                    : 'bg-cyber-panel-secondary text-cyber-muted border border-cyber-border'
+                    ? 'bg-sky-400 text-slate-950 font-bold ring-2 ring-sky-400/30' 
+                    : 'bg-white/[0.05] text-slate-400 border border-white/10'
                 }`}>
                   {isCompleted ? '✓' : idx + 1}
                 </div>
                 <div className="flex flex-col truncate">
-                  <span className={`text-[10px] font-bold leading-tight truncate ${
-                    isCurrent ? 'text-cyber-primary' : isCompleted ? 'text-cyber-success' : 'text-cyber-muted'
+                  <span className={`text-[10px] font-semibold leading-tight truncate ${
+                    isCurrent ? 'text-sky-300' : isCompleted ? 'text-emerald-400' : 'text-slate-400'
                   }`}>
                     L{idx + 1}: {m.title.split(':')[1]?.trim() || m.title}
                   </span>
-                  <span className="text-[9px] text-cyber-muted/70 uppercase">
+                  <span className="text-[9px] text-slate-500 uppercase font-mono">
                     {m.difficulty}
                   </span>
                 </div>
                 {idx < missions.length - 1 && (
-                  <div className={`h-0.5 flex-1 mx-1 ${isCompleted ? 'bg-cyber-success/50' : 'bg-white/10'}`} />
+                  <div className={`h-0.5 flex-1 mx-1 ${isCompleted ? 'bg-emerald-500/40' : 'bg-white/10'}`} />
                 )}
               </div>
             );
@@ -419,25 +418,25 @@ export default function GameMode() {
       </div>
 
       {/* Bottom HUD Bar */}
-      <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none p-3 md:p-5 flex justify-between items-end">
+      <div className="absolute bottom-0 inset-x-0 z-10 pointer-events-none p-3 md:p-5 flex justify-between items-end font-sans">
         
         {/* Real-time Case Telemetry Log */}
-        <div className="cyber-panel w-72 md:w-96 p-3 bg-[#0B1018]/90 border border-cyber-border backdrop-blur-sm rounded pointer-events-auto">
-          <div className="flex items-center justify-between border-b border-cyber-border pb-1.5 mb-2">
-            <span className="text-[10px] font-bold text-cyber-muted uppercase tracking-wider flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-cyber-primary" />
+        <div className="w-72 md:w-96 p-3 bg-[#090D18]/90 border border-white/[0.08] backdrop-blur-md rounded-xl pointer-events-auto">
+          <div className="flex items-center justify-between border-b border-white/[0.06] pb-1.5 mb-2">
+            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+              <Activity className="w-3.5 h-3.5 text-sky-400" />
               CASE TELEMETRY
             </span>
-            <span className="text-[9px] text-cyber-primary">STATUS: CONNECTED</span>
+            <span className="text-[9px] text-emerald-400 font-mono">CONNECTED</span>
           </div>
-          <div className="space-y-1 text-[11px] h-20 overflow-y-auto leading-relaxed">
+          <div className="space-y-1 text-[11px] h-20 overflow-y-auto leading-relaxed font-mono">
             {logs.map((log, idx) => (
-              <p key={idx} className={idx === 0 ? 'text-cyber-primary font-bold' : 'text-cyber-muted'}>
+              <p key={idx} className={idx === 0 ? 'text-sky-300 font-medium' : 'text-slate-400'}>
                 {log}
               </p>
             ))}
           </div>
-          <div className="mt-2 pt-2 border-t border-cyber-border text-[10px] text-cyber-warning leading-snug">
+          <div className="mt-2 pt-2 border-t border-white/[0.06] text-[10px] text-amber-400/90 leading-snug">
             💡 Case Clue: {currentMission.terminalHint}
           </div>
         </div>
