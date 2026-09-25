@@ -279,60 +279,60 @@ export default function GameMode() {
   };
 
   return (
-    <div className="relative w-screen h-screen bg-slate-50 text-slate-900 overflow-hidden select-none font-sans">
+    <div className="relative w-screen h-screen bg-[#05070D] text-slate-100 overflow-hidden select-none font-sans">
       
-      {/* Light Clean Subtle Architectural Grid */}
-      <div className="absolute inset-0 z-0 bg-slate-50 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-40" />
+      {/* Dark Subtle Architectural Grid */}
+      <div className="absolute inset-0 z-0 bg-[#05070D] bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-40" />
 
       {/* Level Up Celebration Toast */}
       {showLevelUpAlert && (
-        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 bg-white border border-slate-200 p-3 sm:p-4 rounded-xl shadow-xl flex items-center gap-3 animate-fadeIn max-w-[90vw]">
-          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 shrink-0" />
+        <div className="absolute top-16 sm:top-20 left-1/2 -translate-x-1/2 z-40 bg-[#0D1322] border border-white/[0.12] p-3 sm:p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-fadeIn max-w-[90vw]">
+          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 shrink-0" />
           <div>
-            <div className="text-[10px] sm:text-xs uppercase text-sky-600 font-semibold tracking-wider flex items-center gap-1.5">
+            <div className="text-[10px] sm:text-xs uppercase text-sky-400 font-semibold tracking-wider flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               LEVEL COMPLETED
             </div>
-            <div className="text-xs sm:text-sm font-semibold text-slate-900 mt-0.5">
+            <div className="text-xs sm:text-sm font-semibold text-white mt-0.5">
               {showLevelUpAlert}
             </div>
           </div>
         </div>
       )}
 
-      {/* Professional Light Header */}
-      <header className="fixed top-0 inset-x-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 bg-white/95 backdrop-blur-md border-b border-slate-200 flex items-center justify-between pointer-events-auto shadow-xs">
+      {/* Professional Dark Header */}
+      <header className="fixed top-0 inset-x-0 z-30 px-3 sm:px-6 py-2.5 sm:py-3 bg-[#080C14]/90 backdrop-blur-md border-b border-white/[0.08] flex items-center justify-between pointer-events-auto shadow-sm">
         
         {/* Left: Organization Identity */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center font-mono text-xs font-bold text-sky-700">
+          <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center font-mono text-xs font-bold text-sky-400">
             CC
           </div>
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-xs font-bold tracking-tight text-slate-900 uppercase">
+              <span className="text-xs font-bold tracking-tight text-white uppercase">
                 CYBER CELL
               </span>
-              <span className="text-[9px] sm:text-[10px] text-sky-700 font-mono px-1.5 py-0.5 rounded bg-sky-50 border border-sky-200 font-medium">
+              <span className="text-[9px] sm:text-[10px] text-sky-400 font-mono px-1.5 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 font-medium">
                 SOC SCREENING
               </span>
             </div>
-            <p className="text-[9px] sm:text-[10px] text-slate-500 font-mono">Stage 01 A • Technical Assessment</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-400 font-mono">Stage 01 A • Technical Assessment</p>
           </div>
         </div>
 
         {/* Center: Clean Level Progression & Question Counter */}
         <div className="flex flex-col items-center gap-1 min-w-0 px-1">
           <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs">
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-white">
               Level {currentMissionIndex + 1} of {missions.length}
             </span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-600 font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-none">
+            <span className="text-white/20">•</span>
+            <span className="text-slate-300 font-medium truncate max-w-[120px] xs:max-w-[160px] sm:max-w-none">
               {currentMission.title.split(':')[1]?.trim() || currentMission.title}
             </span>
-            <span className="text-slate-300 hidden sm:inline">•</span>
-            <span className="text-sky-600 font-mono text-[10px] hidden sm:inline font-semibold">
+            <span className="text-white/20 hidden sm:inline">•</span>
+            <span className="text-sky-400 font-mono text-[10px] hidden sm:inline font-semibold">
               Q{challengeIndexInMission + 1}/{currentMission.challengeIds.length}
             </span>
           </div>
@@ -347,10 +347,10 @@ export default function GameMode() {
                   title={`Level ${idx + 1}: ${m.title}`}
                   className={`h-1.5 rounded-full transition-all ${
                     isCurrent
-                      ? 'w-6 sm:w-8 bg-sky-600 ring-2 ring-sky-100'
+                      ? 'w-6 sm:w-8 bg-sky-400 ring-2 ring-sky-400/20'
                       : isCompleted
-                      ? 'w-3 sm:w-6 bg-emerald-500'
-                      : 'w-2 sm:w-5 bg-slate-200'
+                      ? 'w-3 sm:w-6 bg-emerald-400'
+                      : 'w-2 sm:w-5 bg-white/10'
                   }`}
                 />
               );
@@ -360,16 +360,16 @@ export default function GameMode() {
 
         {/* Right: Timer, Score & End Action */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 border border-slate-200 text-xs rounded-lg">
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
-            <span className={`font-mono font-semibold ${timeRemainingSeconds < 300 ? 'text-red-600 animate-pulse' : 'text-slate-700'}`}>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.05] border border-white/[0.08] text-xs rounded-lg">
+            <Clock className="w-3.5 h-3.5 text-amber-400" />
+            <span className={`font-mono font-semibold ${timeRemainingSeconds < 300 ? 'text-rose-400 animate-pulse' : 'text-slate-200'}`}>
               {formatTimer(timeRemainingSeconds)}
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-slate-100 border border-slate-200 text-xs rounded-lg">
-            <span className="text-[10px] uppercase font-mono text-slate-500 font-semibold">Score</span>
-            <span className="font-bold text-slate-900 font-mono">{score}</span>
+          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-white/[0.05] border border-white/[0.08] text-xs rounded-lg">
+            <span className="text-[10px] uppercase font-mono text-slate-400 font-semibold">Score</span>
+            <span className="font-bold text-white font-mono">{score}</span>
           </div>
 
           <button
@@ -378,7 +378,7 @@ export default function GameMode() {
                 navigate('/result');
               }
             }}
-            className="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors cursor-pointer"
           >
             Submit & End
           </button>
@@ -389,14 +389,14 @@ export default function GameMode() {
       {/* Main Focus Area (When question modal is preparing or transitioning) */}
       <main className="absolute inset-0 flex flex-col items-center justify-center p-4 pt-16 z-10">
         {!activeChallenge && !showRound1CompleteModal && (
-          <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm text-center animate-scaleIn">
-            <div className="w-12 h-12 rounded-xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center mx-auto mb-4">
+          <div className="max-w-md w-full bg-[#0D1322] border border-white/[0.1] rounded-2xl p-6 sm:p-8 shadow-2xl text-center animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">
+            <h3 className="text-base font-bold text-white">
               Level {currentMissionIndex + 1}: {currentMission.title}
             </h3>
-            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
               {currentMission.terminalHint || 'Prepare for next technical problem.'}
             </p>
             <div className="mt-5">
@@ -406,7 +406,7 @@ export default function GameMode() {
                   const chal = challenges.find(c => c.id === currentChallengeId) || challenges[0];
                   setActiveChallenge(chal);
                 }}
-                className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <span>Open Question {challengeIndexInMission + 1}</span>
                 <ChevronRight className="w-4 h-4" />
@@ -417,17 +417,17 @@ export default function GameMode() {
       </main>
 
       {/* Live Proctoring Webcam Picture-In-Picture */}
-      <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-30 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl p-2 shadow-md flex flex-col gap-1.5 pointer-events-auto font-sans w-28 sm:w-36">
+      <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-30 bg-[#0D1322]/95 backdrop-blur-md border border-white/[0.12] rounded-xl p-2 shadow-2xl flex flex-col gap-1.5 pointer-events-auto font-sans w-28 sm:w-36">
         <div className="flex items-center justify-between text-[10px]">
           <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-slate-800">Proctor</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold text-slate-200">Proctor</span>
           </div>
-          <span className="text-[9px] text-slate-500 font-mono uppercase">
+          <span className="text-[9px] text-slate-400 font-mono uppercase">
             {cameraActive ? 'Active' : 'Offline'}
           </span>
         </div>
-        <div className="w-full h-18 sm:h-24 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
+        <div className="w-full h-18 sm:h-24 bg-[#080C14] rounded-lg border border-white/[0.08] overflow-hidden relative flex items-center justify-center">
           <video
             ref={proctorVideoRef}
             autoPlay
@@ -437,7 +437,7 @@ export default function GameMode() {
           />
           {!cameraActive && (
             <div className="flex flex-col items-center justify-center gap-1 text-slate-400 p-1 text-center">
-              <VideoOff className="w-4 h-4 text-red-500" />
+              <VideoOff className="w-4 h-4 text-rose-500" />
               <span className="text-[9px]">Camera...</span>
             </div>
           )}
@@ -445,14 +445,14 @@ export default function GameMode() {
       </div>
 
       {/* Bottom Telemetry Bar (Desktop) */}
-      <div className="hidden lg:flex fixed bottom-5 left-5 z-20 w-80 p-3 bg-white/90 border border-slate-200 backdrop-blur-md rounded-xl shadow-xs pointer-events-auto items-center justify-between text-xs">
+      <div className="hidden lg:flex fixed bottom-5 left-5 z-20 w-80 p-3 bg-[#0D1322]/90 border border-white/[0.08] backdrop-blur-md rounded-xl shadow-lg pointer-events-auto items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-sky-600" />
-          <span className="text-[11px] font-medium text-slate-700 font-mono">
+          <Activity className="w-4 h-4 text-sky-400" />
+          <span className="text-[11px] font-medium text-slate-300 font-mono">
             {logs[0] || 'System Active'}
           </span>
         </div>
-        <span className="text-[10px] text-emerald-600 font-mono font-semibold">LIVE</span>
+        <span className="text-[10px] text-emerald-400 font-mono font-semibold">LIVE</span>
       </div>
 
       {/* Active Case Challenge Modal */}
@@ -466,54 +466,54 @@ export default function GameMode() {
 
       {/* Round 1 Completion Transition Modal */}
       {showRound1CompleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
-          <div className="w-full max-w-lg bg-white p-8 border border-slate-200 text-center shadow-xl rounded-2xl animate-scaleIn">
-            <div className="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center mx-auto mb-4">
-              <Trophy className="w-7 h-7 text-sky-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-[#0D1322] p-8 border border-white/[0.12] text-center shadow-2xl rounded-2xl animate-scaleIn">
+            <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center mx-auto mb-4">
+              <Trophy className="w-7 h-7 text-sky-400" />
             </div>
 
-            <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 bg-sky-50 border border-sky-200 text-sky-700 rounded-md inline-block mb-2">
+            <span className="text-[10px] uppercase font-semibold tracking-wider px-2.5 py-0.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-md inline-block mb-2">
               SOC OPERATIONS COMPLETE
             </span>
 
-            <h3 className="text-xl md:text-2xl font-bold text-slate-900 uppercase tracking-tight">
+            <h3 className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight">
               Round 01 A Assessment Complete
             </h3>
 
-            <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
               All 30 SOC screening questions and scenarios resolved. Your tactical performance baseline has been captured.
             </p>
 
-            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-left">
+            <div className="grid grid-cols-2 gap-3 my-6 p-4 rounded-xl bg-[#080C14] border border-white/[0.08] text-left">
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block font-mono">Score Earned</span>
-                <span className="text-xl font-bold text-slate-900 font-mono">{score} PTS</span>
+                <span className="text-[10px] text-slate-400 uppercase block font-mono">Score Earned</span>
+                <span className="text-xl font-bold text-white font-mono">{score} PTS</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block font-mono">XP Progression</span>
-                <span className="text-xl font-bold text-indigo-600 font-mono">{xp} XP</span>
+                <span className="text-[10px] text-slate-400 uppercase block font-mono">XP Progression</span>
+                <span className="text-xl font-bold text-indigo-400 font-mono">{xp} XP</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate('/technical-profile')}
-                className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Sparkles className="w-4 h-4 text-sky-400" />
+                <Sparkles className="w-4 h-4 text-sky-600" />
                 <span>ENTER ROUND 01 B: SKILL PROFILING &rarr;</span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => navigate('/result')}
-                  className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 border border-white/[0.08] font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
                   View Scorecard
                 </button>
                 <button
                   onClick={() => navigate('/arcade')}
-                  className="py-2.5 px-3 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                  className="py-2.5 px-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 font-semibold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
                   Bonus Labs
                 </button>
@@ -525,21 +525,21 @@ export default function GameMode() {
 
       {/* Anti-Cheat Warning Modal */}
       {warningNotice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
-          <div className="w-full max-w-lg bg-white p-6 border border-red-200 text-center shadow-xl rounded-2xl animate-scaleIn">
-            <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto p-4 select-none font-sans">
+          <div className="w-full max-w-lg bg-[#0D1322] p-6 border border-rose-500/30 text-center shadow-2xl rounded-2xl animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-rose-400" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-wider">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider">
               Integrity Violation Recorded
             </h3>
-            <div className="mt-4 p-4 bg-red-50/60 border border-red-200 rounded-xl text-left text-xs text-slate-700 whitespace-pre-line leading-relaxed font-mono">
+            <div className="mt-4 p-4 bg-rose-950/30 border border-rose-500/20 rounded-xl text-left text-xs text-rose-200 whitespace-pre-line leading-relaxed font-mono">
               {warningNotice.message}
             </div>
             <div className="mt-6 flex flex-col gap-2.5">
               <button
                 onClick={restoreFullscreen}
-                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm cursor-pointer"
+                className="w-full py-3 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 rounded-lg transition-all shadow-md cursor-pointer"
               >
                 <Maximize2 className="w-4 h-4" />
                 RESTORE FULLSCREEN & CONTINUE

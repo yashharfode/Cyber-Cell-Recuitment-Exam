@@ -358,24 +358,24 @@ export default function Round2Assessment() {
 
   if (!blueprint) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center font-mono text-sky-700 text-xs">
+      <div className="min-h-screen bg-[#080C14] flex items-center justify-center font-mono text-sky-400 text-xs">
         INITIALIZING TECHNICAL ASSESSMENT ENVIRONMENT...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#080C14] text-slate-100 flex flex-col font-sans select-none">
       
       {/* Top Fixed HUD Banner */}
-      <div className="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+      <div className="bg-[#080C14]/90 backdrop-blur-md border-b border-white/[0.08] px-4 md:px-8 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-sky-600 animate-ping" />
+          <div className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
           <div>
-            <h1 className="text-xs md:text-sm font-bold text-slate-900 tracking-wider uppercase">
+            <h1 className="text-xs md:text-sm font-bold text-white tracking-wider uppercase">
               ROUND 01 B • TECHNICAL ASSESSMENT
             </h1>
-            <p className="text-[10px] text-slate-500 font-mono">
+            <p className="text-[10px] text-slate-400 font-mono">
               CHALLENGE {currentIndex + 1} OF {blueprint.orderedChallengeIds.length} • {currentChallenge?.domain || 'TECHNICAL'}
             </p>
           </div>
@@ -388,10 +388,10 @@ export default function Round2Assessment() {
               key={idx}
               className={`w-2 h-2 rounded-full transition-all ${
                 idx === currentIndex
-                  ? 'bg-sky-600 ring-4 ring-sky-100 scale-125'
+                  ? 'bg-sky-400 ring-4 ring-sky-400/20 scale-125'
                   : idx < currentIndex
-                  ? 'bg-emerald-500'
-                  : 'bg-slate-200'
+                  ? 'bg-emerald-400'
+                  : 'bg-white/10'
               }`}
             />
           ))}
@@ -400,7 +400,7 @@ export default function Round2Assessment() {
         {/* Right HUD Controls: Webcam + Fullscreen + Timer */}
         <div className="flex items-center gap-3">
           {/* Proctoring Webcam Mini-Pip */}
-          <div className="relative w-12 h-9 sm:w-14 sm:h-10 bg-slate-100 border border-slate-200 rounded-lg overflow-hidden shrink-0">
+          <div className="relative w-12 h-9 sm:w-14 sm:h-10 bg-[#0D1322] border border-white/[0.08] rounded-lg overflow-hidden shrink-0">
             <video
               ref={proctorVideoRef}
               autoPlay
@@ -408,16 +408,16 @@ export default function Round2Assessment() {
               playsInline
               className="w-full h-full object-cover -scale-x-100"
             />
-            <div className="absolute top-1 right-1 flex items-center gap-1 bg-white/90 px-1 py-0.2 rounded text-[8px] font-mono shadow-xs">
-              <span className={`w-1.5 h-1.5 rounded-full ${cameraActive ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`} />
-              <span className="text-slate-800 hidden md:inline">PROCTOR</span>
+            <div className="absolute top-1 right-1 flex items-center gap-1 bg-[#080C14]/90 px-1 py-0.2 rounded text-[8px] font-mono shadow-sm">
+              <span className={`w-1.5 h-1.5 rounded-full ${cameraActive ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
+              <span className="text-slate-300 hidden md:inline">PROCTOR</span>
             </div>
           </div>
 
           {/* Fullscreen Button */}
           <button
             onClick={requestFullscreen}
-            className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 transition-all text-xs flex items-center gap-1.5 cursor-pointer"
+            className="p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] text-slate-300 transition-all text-xs flex items-center gap-1.5 cursor-pointer"
             title="Toggle Fullscreen"
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -425,9 +425,9 @@ export default function Round2Assessment() {
           </button>
 
           {/* Countdown Timer */}
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono">
-            <Clock className="w-4 h-4 text-amber-600" />
-            <span className={timeRemainingSeconds < 180 ? 'text-red-600 font-bold animate-pulse' : 'text-slate-900 font-bold'}>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.05] border border-white/[0.08] rounded-lg text-xs font-mono">
+            <Clock className="w-4 h-4 text-amber-400" />
+            <span className={timeRemainingSeconds < 180 ? 'text-rose-400 font-bold animate-pulse' : 'text-slate-200 font-bold'}>
               {Math.floor(timeRemainingSeconds / 60)}:{(timeRemainingSeconds % 60).toString().padStart(2, '0')}
             </span>
           </div>
@@ -460,24 +460,24 @@ export default function Round2Assessment() {
          currentChallenge.tier !== 'fill_in_blank' && 
          currentChallenge.tier !== 'subjective' && 
          currentChallenge.tier !== 'practical' && (
-          <div className="w-full max-w-3xl bg-white border border-slate-200 flex flex-col max-h-[85vh] shadow-xl rounded-2xl animate-scaleIn overflow-hidden my-auto font-sans">
+          <div className="w-full max-w-3xl bg-[#0D1322] border border-white/[0.12] flex flex-col max-h-[85vh] shadow-2xl rounded-2xl animate-scaleIn overflow-hidden my-auto font-sans">
             
             {/* Challenge Header - Fixed */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50 shrink-0">
+            <div className="flex items-center justify-between border-b border-white/[0.08] px-6 py-4 bg-[#090D18]/90 shrink-0">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-50 text-sky-700 border border-sky-200 rounded">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded">
                     {currentChallenge.tier === 'knowledge' ? 'TIER 1 • KNOWLEDGE' : 'TIER 2 • APPLICATION'}
                   </span>
-                  <span className="text-[10px] text-slate-500 uppercase font-mono">
+                  <span className="text-[10px] text-slate-400 uppercase font-mono">
                     {currentChallenge.domain} • {currentChallenge.subSkill}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 tracking-tight mt-1">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight mt-1">
                   {currentChallenge.title}
                 </h2>
               </div>
-              <div className="text-xs px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold rounded-md shrink-0">
+              <div className="text-xs px-2.5 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-semibold rounded-md shrink-0">
                 +{currentChallenge.points} PTS
               </div>
             </div>
@@ -485,7 +485,7 @@ export default function Round2Assessment() {
             {/* Scrollable Content Body */}
             <div className="flex-1 overflow-y-auto min-h-0 px-6 py-5 space-y-4">
               {/* Prompt Box */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed text-sm text-slate-800 whitespace-pre-wrap">
+              <div className="p-4 bg-[#080C14] border border-white/[0.08] rounded-xl leading-relaxed text-sm text-slate-200 whitespace-pre-wrap">
                 {currentChallenge.prompt}
               </div>
 
@@ -493,11 +493,11 @@ export default function Round2Assessment() {
               {currentChallenge.options && (
                 <div className="space-y-2.5">
                   <div className="flex justify-between items-center mb-1">
-                    <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
                       SELECT YOUR ANSWER:
                     </p>
-                    <span className="text-[11px] text-slate-500 hidden sm:inline-block">
-                      Tip: Press <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">D</kbd> or <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-300 text-slate-700 rounded text-[10px]">↵ ENTER</kbd>
+                    <span className="text-[11px] text-slate-400 hidden sm:inline-block">
+                      Tip: Press <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded text-[10px]">A</kbd> <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded text-[10px]">B</kbd> <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded text-[10px]">C</kbd> <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded text-[10px]">D</kbd> or <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded text-[10px]">↵ ENTER</kbd>
                     </span>
                   </div>
 
@@ -511,12 +511,12 @@ export default function Round2Assessment() {
                         onClick={() => setSelectedOption(opt)}
                         className={`w-full text-left p-3.5 text-sm transition-all rounded-xl flex items-start gap-3 cursor-pointer disabled:cursor-not-allowed ${
                           isSelected
-                            ? 'border border-sky-500 bg-sky-50 text-slate-900 font-semibold ring-1 ring-sky-500/20'
-                            : 'border border-slate-200 bg-white text-slate-700 hover:border-sky-300 hover:bg-slate-50'
+                            ? 'border border-sky-400 bg-sky-500/15 text-white font-semibold ring-1 ring-sky-400/30'
+                            : 'border border-white/[0.08] bg-[#0A0F1D] text-slate-300 hover:border-white/20 hover:bg-white/[0.04]'
                         }`}
                       >
                         <span className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold border transition-colors ${
-                          isSelected ? 'border-sky-600 bg-sky-600 text-white font-bold' : 'border-slate-300 text-slate-500 bg-slate-100'
+                          isSelected ? 'border-sky-400 bg-sky-400 text-slate-950 font-bold' : 'border-white/20 text-slate-400 bg-white/[0.05]'
                         }`}>
                           {String.fromCharCode(65 + idx)}
                         </span>
@@ -529,21 +529,21 @@ export default function Round2Assessment() {
 
               {/* Neutral Response Recorded Confirmation */}
               {isSubmittedCurrent && (
-                <div className="p-3.5 border border-emerald-200 bg-emerald-50 rounded-xl flex items-center justify-between text-emerald-800 animate-fadeIn">
+                <div className="p-3.5 border border-emerald-500/30 bg-emerald-500/10 rounded-xl flex items-center justify-between text-emerald-300 animate-fadeIn">
                   <div className="flex items-center gap-2.5 text-sm font-semibold">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                     <span>RESPONSE RECORDED</span>
                   </div>
-                  <span className="text-xs text-slate-500 hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
+                  <span className="text-xs text-slate-400 hidden sm:inline">Press ENTER or click Next Challenge to proceed</span>
                 </div>
               )}
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex justify-between items-center px-6 py-4 border-t border-slate-200 bg-slate-50 shrink-0">
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <CornerDownLeft className="w-4 h-4 text-sky-600" />
-                <span>Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 text-slate-800 rounded font-mono text-[10px]">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
+            <div className="flex justify-between items-center px-6 py-4 border-t border-white/[0.08] bg-[#090D18]/90 shrink-0">
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <CornerDownLeft className="w-4 h-4 text-sky-400" />
+                <span>Press <kbd className="px-1.5 py-0.5 bg-white/10 border border-white/20 text-white rounded font-mono text-[10px]">ENTER</kbd> to {isSubmittedCurrent ? 'proceed to next' : 'submit'}</span>
               </div>
 
               {!isSubmittedCurrent ? (
@@ -551,19 +551,19 @@ export default function Round2Assessment() {
                   type="button"
                   onClick={handleMcqSubmit}
                   disabled={!selectedOption}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-white/10 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4 text-sky-400" />
+                  <Sparkles className="w-4 h-4 text-sky-600" />
                   <span>SUBMIT ANSWER [ ↵ ]</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleNextQuestion}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 cursor-pointer flex items-center gap-2"
+                  className="px-6 py-2.5 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-white/10 active:scale-95 cursor-pointer flex items-center gap-2"
                 >
                   <span>NEXT CHALLENGE [ ↵ ]</span>
-                  <ArrowRight className="w-4 h-4 text-white" />
+                  <ArrowRight className="w-4 h-4 text-slate-950" />
                 </button>
               )}
             </div>
@@ -575,22 +575,22 @@ export default function Round2Assessment() {
 
       {/* Fullscreen Required / Exit Warning Modal */}
       {showFullscreenModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 select-none">
-          <div className="w-full max-w-lg bg-white p-6 border border-red-200 text-center shadow-xl rounded-2xl animate-scaleIn">
-            <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-200 text-red-600 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-600" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 select-none">
+          <div className="w-full max-w-lg bg-[#0D1322] p-6 border border-rose-500/30 text-center shadow-2xl rounded-2xl animate-scaleIn">
+            <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-rose-400" />
             </div>
 
-            <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">
+            <h3 className="text-lg font-bold text-white uppercase tracking-tight">
               Fullscreen Mode Mandatory
             </h3>
 
-            <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
               {violationNotice || 'Recruitment integrity policies require uninterrupted fullscreen mode throughout Round 01 B.'}
             </p>
 
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-left text-xs text-red-800 flex items-center gap-2.5">
-              <ShieldAlert className="w-4 h-4 shrink-0 text-red-600" />
+            <div className="mt-4 p-3 bg-rose-950/30 border border-rose-500/20 rounded-xl text-left text-xs text-rose-200 flex items-center gap-2.5">
+              <ShieldAlert className="w-4 h-4 shrink-0 text-rose-400" />
               <span>
                 Violations Recorded: <strong>{violationCount}</strong>. Continued tab or app switching will result in automatic session termination.
               </span>
@@ -598,7 +598,7 @@ export default function Round2Assessment() {
 
             <button
               onClick={requestFullscreen}
-              className="mt-6 w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="mt-6 w-full py-3 bg-white hover:bg-slate-200 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-white/10 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Maximize2 className="w-4 h-4" />
               <span>RETURN TO FULLSCREEN & RESUME</span>
