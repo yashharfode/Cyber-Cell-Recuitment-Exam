@@ -241,8 +241,12 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
                 type={challenge.interactiveType}
                 config={challenge.interactiveConfig}
                 disabled={isSubmitted}
-                onSolve={(answer) => {
-                  setSelectedOption(typeof answer === 'string' ? answer : JSON.stringify(answer));
+                onSolve={(answer, isCorrect) => {
+                  if (typeof isCorrect === 'boolean') {
+                    setSelectedOption(isCorrect ? (typeof challenge.correctAnswer === 'string' ? challenge.correctAnswer : JSON.stringify(answer)) : 'INCORRECT_SOLUTION');
+                  } else {
+                    setSelectedOption(typeof answer === 'string' ? answer : JSON.stringify(answer));
+                  }
                 }}
               />
             </div>

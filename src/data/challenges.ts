@@ -319,19 +319,17 @@ print(x + y)
     points: 100,
     timeLimit: 45,
     title: 'QUESTION 13 // IF-ELSE BRANCH EVALUATION',
-    prompt: `What will this code print? You can test the algorithm live below!
+    prompt: `ALGORITHM SPECIFICATION:
+A Python script must evaluate authorization levels according to these exact conditions:
+1. Initialize variable 'x' with the value 10.
+2. Check if 'x' is strictly greater than 5:
+   - When True, output "A"
+   - Otherwise, output "B"
 
-\`\`\`python
-x = 10
-
-if x > 5:
-    print("A")
-else:
-    print("B")
-\`\`\``,
+The statements below are currently scrambled. Use the controls to arrange the code blocks in the correct execution sequence and indentation, then run the sequence to verify your logic.`,
     interactiveType: 'code-arranger',
     interactiveConfig: {
-      prompt: 'Arrange the Python statements into valid order to test if x > 5 and print "A".',
+      prompt: 'Reorder the blocks into valid Python syntax matching the specification above.',
       blocks: [
         { id: 'b-1', text: 'x = 10', expectedIndex: 0, indent: 0 },
         { id: 'b-2', text: 'if x > 5:', expectedIndex: 1, indent: 0 },
@@ -348,7 +346,7 @@ else:
       'D. Error'
     ],
     correctAnswer: 'A. A',
-    explanation: 'Since 10 is greater than 5, the condition x > 5 is True, executing the if branch: print("A").'
+    explanation: 'Since x = 10 and 10 > 5 is True, the if branch executes: print("A").'
   },
   {
     id: 'c-q14',
