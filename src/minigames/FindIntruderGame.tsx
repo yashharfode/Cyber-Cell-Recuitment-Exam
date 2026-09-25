@@ -25,7 +25,7 @@ const DEFAULT_LOGS: LogEntry[] = [
   { id: 'log-1', user: 'Rahul_Sharma', ip: '192.168.1.10', time: '10:20 AM', location: 'SATI Lab-3', role: 'Student User', isAnomaly: false },
   { id: 'log-2', user: 'Aman_Verma', ip: '192.168.1.12', time: '10:21 AM', location: 'SATI Library', role: 'Student User', isAnomaly: false },
   { id: 'log-3', user: 'Riya_Gupta', ip: '192.168.1.14', time: '10:22 AM', location: 'SATI Lab-1', role: 'Student User', isAnomaly: false },
-  { id: 'log-4', user: 'Domain_Admin', ip: '185.92.18.4', time: '03:17 AM', location: 'Foreign VPS / Tor Exit', role: 'Superuser Elevation', isAnomaly: true, anomalyReason: 'Untrusted public IP (185.92.18.4) accessing domain root privileges at 03:17 AM outside authorized academic hours.' },
+  { id: 'log-4', user: 'Domain_Admin', ip: '185.92.18.4', time: '03:17 AM', location: 'Foreign VPS / Tor Exit', role: 'System Admin', isAnomaly: true, anomalyReason: 'Untrusted public IP (185.92.18.4) accessing domain root privileges at 03:17 AM outside authorized academic hours.' },
   { id: 'log-5', user: 'Priya_Patel', ip: '192.168.1.15', time: '10:25 AM', location: 'SATI Faculty Block', role: 'Staff User', isAnomaly: false },
   { id: 'log-6', user: 'Vikas_Joshi', ip: '192.168.1.18', time: '10:27 AM', location: 'SATI Lab-2', role: 'Student User', isAnomaly: false },
 ];
@@ -108,9 +108,7 @@ export default function FindIntruderGame({ config, onSolve, disabled }: FindIntr
                   </td>
                   <td className="py-2.5 px-3">{entry.location}</td>
                   <td className="py-2.5 px-3">
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold ${
-                      entry.role.includes('Superuser') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-white/5 text-cyber-muted'
-                    }`}>
+                    <span className="text-[10px] px-2 py-0.5 rounded uppercase font-medium bg-white/5 text-cyber-muted border border-white/10">
                       {entry.role}
                     </span>
                   </td>

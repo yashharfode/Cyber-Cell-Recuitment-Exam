@@ -611,6 +611,16 @@ What is the safest first action?`,
     title: 'QUESTION 25 // LOGIN LOG INVESTIGATION',
     prompt: `Inspect the authentication telemetry below and click the anomalous intrusion row:`,
     interactiveType: 'find-intruder',
+    interactiveConfig: {
+      prompt: 'Inspect the authentication telemetry below. Identify and flag the anomalous login attempt.',
+      logs: [
+        { id: 'log-1', user: 'Rahul_Sharma', ip: '192.168.1.10', time: '10:14 AM', location: 'Campus Lab-1', role: 'Student User', isAnomaly: false },
+        { id: 'log-2', user: 'Aman_Verma', ip: '192.168.1.11', time: '10:15 AM', location: 'Campus Library', role: 'Student User', isAnomaly: false },
+        { id: 'log-3', user: 'Rahul_Sharma', ip: '185.44.19.7', time: '10:16 AM', location: 'External VPS', role: 'Student User', isAnomaly: true, anomalyReason: 'User Rahul_Sharma authenticated from external IP (185.44.19.7) immediately after a campus lab session, indicating credential compromise.' },
+        { id: 'log-4', user: 'Priya_Patel', ip: '192.168.1.15', time: '10:18 AM', location: 'Faculty Block', role: 'Staff User', isAnomaly: false },
+        { id: 'log-5', user: 'Vikas_Joshi', ip: '192.168.1.18', time: '10:20 AM', location: 'Campus Lab-2', role: 'Student User', isAnomaly: false }
+      ]
+    },
     options: [
       'A. Rahul — 192.168.1.10',
       'B. Aman — 192.168.1.11',
@@ -618,7 +628,7 @@ What is the safest first action?`,
       'D. None of them'
     ],
     correctAnswer: 'C. Rahul — 185.44.19.7 SUCCESS',
-    explanation: 'Rahul normally logs in from local IP 192.168.1.10. An external IP (185.44.19.7) failed and then immediately succeeded 1 minute later, indicating potential credential compromise.'
+    explanation: 'Rahul normally logs in from local IP 192.168.1.10. An external IP (185.44.19.7) logged in 2 minutes later, indicating potential credential compromise.'
   },
   {
     id: 'c-q26',
