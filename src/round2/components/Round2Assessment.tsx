@@ -337,6 +337,67 @@ export default function Round2Assessment() {
     };
   }, [submissions]);
 
+  // Handle Tab Switch in Round 01 B: skip active question, deduct -50 PTS, and advance to next challenge
+  useEffect(() => {
+    const handleTabSwitch = () => {
+      if (document.hidden) {
+        const activeChal = currentChallengeRef.current;
+        const isSubmitted = isSubmittedCurrentRef.current;
+        const bp = blueprintRef.current;
+        const cIdx = currentIndexRef.current;
+
+        if (activeChal && !isSubmitted) {
+          const skippedTitle = activeChal.title;
+
+          // Deduct -50 PTS negative marking penalty and skip
+          const skippedSubmission: ChallengeSubmission = {
+            challengeId: activeChal.id,
+            domain: activeChal.domain,
+            tier: activeChal.tier,
+            userAnswer: '[SKIPPED DUE TO TAB SWITCH VIOLATION]',
+            awardedScore: -50,
+            maxScore: activeChal.points,
+            isCorrect: false,
+            timeSpentSeconds: 0,
+            timestamp: new Date().toISOString()
+          };
+
+          const updatedSubs = [...submissions, skippedSubmission];
+          setSubmissions(updatedSubs);
+
+          // Advance to next challenge
+          if (bp && cIdx + 1 < bp.orderedChallengeIds.length) {
+            setCurrentIndex(cIdx + 1);
+          } else {
+            finalizeAssessmentRef.current(updatedSubs);
+          }
+
+          setSelectedOption('');
+          setIsSubmittedCurrent(false);
+          setViolationCount(prev => prev + 1);
+
+          setViolationNotice(
+            `CRITICAL INTEGRITY VIOLATION: TAB SWITCH DETECTED!\n\nYou switched tabs or minimized the browser window.\n\nQuestion "${skippedTitle}" was immediately SKIPPED and a -50 POINTS NEGATIVE MARKING penalty has been deducted from your score!\n\n⚠️ DO NOT SWITCH TABS AGAIN! Continuous focus on the assessment tab is strictly mandatory.`
+          );
+          setShowFullscreenModal(true);
+        } else {
+          setViolationNotice(
+            `SECURITY WARNING: TAB SWITCH DETECTED!\n\nTab switching is strictly monitored during Round 01 B. Switching tabs while answering an active challenge will immediately skip it with -50 PTS negative marking!\n\nPlease remain focused on the assessment tab.`
+          );
+          setShowFullscreenModal(true);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleTabSwitch);
+    window.addEventListener('blur', handleTabSwitch);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleTabSwitch);
+      window.removeEventListener('blur', handleTabSwitch);
+    };
+  }, [submissions]);
+
   const requestFullscreen = async () => {
     const success = await enterBrowserFullscreen();
     if (success || isBrowserFullscreen()) {

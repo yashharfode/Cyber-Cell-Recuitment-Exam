@@ -44,7 +44,7 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
     };
   }, []);
 
-  // Security integrity: If candidate exits fullscreen, immediately disappear the question
+  // Security integrity: If candidate exits fullscreen or switches tabs, immediately disappear the question
   useEffect(() => {
     const handleFullscreenState = () => {
       if (!isBrowserFullscreen()) {
@@ -52,9 +52,20 @@ export default function ChallengeModal({ challenge, onClose, onSuccessNext }: Ch
       }
     };
 
+    const handleVisibilityState = () => {
+      if (document.hidden) {
+        onClose();
+      }
+    };
+
     FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenState));
+    document.addEventListener('visibilitychange', handleVisibilityState);
+    window.addEventListener('blur', handleVisibilityState);
+
     return () => {
       FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenState));
+      document.removeEventListener('visibilitychange', handleVisibilityState);
+      window.removeEventListener('blur', handleVisibilityState);
     };
   }, [onClose]);
 

@@ -162,10 +162,19 @@ export default function CyberArcade() {
       }
     };
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setShowWarningModal(true);
+      }
+    };
+
     FULLSCREEN_EVENTS.forEach(evt => document.addEventListener(evt, handleFullscreenChange));
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       clearTimeout(initialCheck);
       FULLSCREEN_EVENTS.forEach(evt => document.removeEventListener(evt, handleFullscreenChange));
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 

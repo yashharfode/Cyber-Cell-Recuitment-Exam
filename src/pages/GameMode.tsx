@@ -131,6 +131,53 @@ export default function GameMode() {
     };
   }, [activeChallenge, challengeIndexInMission, currentMission, penalizeAndSkipChallenge, advanceMission, setWarningNotice]);
 
+  // Handle Tab Switch: Immediately skip active question, apply penalty, and advance to next question
+  useEffect(() => {
+    const handleTabSwitch = () => {
+      if (document.hidden) {
+        if (activeChallenge) {
+          const skippedTitle = activeChallenge.title;
+          const skippedId = activeChallenge.id;
+
+          penalizeAndSkipChallenge(skippedId, 50);
+          setActiveChallenge(null);
+
+          // Advance to next challenge in mission
+          const nextIdx = challengeIndexInMission + 1;
+          if (nextIdx < currentMission.challengeIds.length) {
+            setChallengeIndexInMission(nextIdx);
+          } else {
+            setChallengeIndexInMission(0);
+            advanceMission();
+          }
+
+          setWarningNotice({
+            message: `CRITICAL INTEGRITY VIOLATION: TAB SWITCH DETECTED!\n\nYou switched tabs or minimized the browser window.\n\nQuestion "${skippedTitle}" was immediately SKIPPED and a -50 POINTS NEGATIVE MARKING penalty has been deducted from your score.\n\n⚠️ DO NOT SWITCH TABS AGAIN! Remain focused on the assessment tab at all times.`,
+            severity: 'high'
+          });
+
+          setLogs(prev => [
+            `⛔ TAB SWITCH VIOLATION: "${skippedTitle}" SKIPPED (-50 PTS PENALTY)`,
+            ...prev.slice(0, 6)
+          ]);
+        } else {
+          setWarningNotice({
+            message: `TAB SWITCH DETECTED!\n\nSwitching tabs is strictly monitored. If you switch tabs while answering any question, it will be immediately skipped with negative marking!\n\nPlease remain focused on the assessment tab.`,
+            severity: 'high'
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleTabSwitch);
+    window.addEventListener('blur', handleTabSwitch);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleTabSwitch);
+      window.removeEventListener('blur', handleTabSwitch);
+    };
+  }, [activeChallenge, challengeIndexInMission, currentMission, penalizeAndSkipChallenge, advanceMission, setWarningNotice]);
+
   // Anti-cheat monitoring for recruitment mode
   useEffect(() => {
     if (mode === 'recruitment') {
