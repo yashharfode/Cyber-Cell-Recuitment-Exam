@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Play, 
@@ -26,6 +26,25 @@ export default function LandingPage() {
   const { setMode, isRound1Submitted, setRound1Submitted, score, completedMissionIds, attemptId } = useStore();
   const [activeModal, setActiveModal] = useState<'howItWorks' | 'requirements' | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Guarantee unrestricted native vertical scrolling on Home Page
+  useEffect(() => {
+    document.documentElement.style.overflowY = 'auto';
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowY = 'auto';
+    document.body.style.overflowX = 'hidden';
+    document.body.style.height = 'auto';
+    document.documentElement.style.height = 'auto';
+
+    return () => {
+      document.documentElement.style.overflowY = '';
+      document.documentElement.style.overflowX = '';
+      document.body.style.overflowY = '';
+      document.body.style.overflowX = '';
+      document.body.style.height = '';
+      document.documentElement.style.height = '';
+    };
+  }, []);
 
   const isR1Complete = 
     isRound1Submitted || 
@@ -56,7 +75,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080C14] text-slate-100 font-sans flex flex-col justify-between relative overflow-x-hidden selection:bg-sky-500/20 selection:text-sky-200">
+    <div className="w-full min-h-screen bg-[#080C14] text-slate-100 font-sans flex flex-col relative overflow-x-hidden selection:bg-sky-500/20 selection:text-sky-200">
       
       {/* Background Architectural Grid: Subtle & Enterprise-Grade */}
       <div 
